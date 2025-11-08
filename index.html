@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETF 今日變動</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-white: rgba(255, 255, 255, 1);
+            --color-black: rgba(0, 0, 0, 1);
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-gray-300: rgba(167, 169, 169, 1);
+            --color-gray-400: rgba(119, 124, 124, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-brown-600: rgba(94, 82, 64, 1);
+            --color-charcoal-700: rgba(31, 33, 33, 1);
+            --color-charcoal-800: rgba(38, 40, 40, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-teal-300: rgba(50, 184, 198, 1);
+            --color-teal-400: rgba(45, 166, 178, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-teal-600: rgba(29, 116, 128, 1);
+            --color-teal-700: rgba(26, 104, 115, 1);
+            --color-teal-800: rgba(41, 150, 161, 1);
+            --color-red-400: rgba(255, 84, 89, 1);
+            --color-red-500: rgba(192, 21, 47, 1);
+            --color-orange-400: rgba(230, 129, 97, 1);
+            --color-orange-500: rgba(168, 75, 47, 1);
+            --color-background: var(--color-cream-50);
+            --color-surface: var(--color-cream-100);
+            --color-text: var(--color-slate-900);
+            --color-text-secondary: var(--color-slate-500);
+            --color-primary: var(--color-teal-500);
+            --color-primary-hover: var(--color-teal-600);
+            --color-border: rgba(94, 82, 64, 0.2);
+            --color-card-border: rgba(94, 82, 64, 0.12);
+            --font-family-base: "FKGroteskNeue", "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-size-base: 14px;
+            --font-size-lg: 16px;
+            --font-size-xl: 18px;
+            --font-size-2xl: 20px;
+            --font-size-3xl: 24px;
+            --font-size-4xl: 30px;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 550;
+            --font-weight-bold: 600;
+            --space-8: 8px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-20: 20px;
+            --space-24: 24px;
+            --space-32: 32px;
+            --radius-base: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+        }
+
+        /* Custom variables for light theme */
+        :root {
+            --bg-main: #f9fbfc;
+            --bg-header: #f5f7fa;
+            --bg-card: #ffffff;
+            --text-dark: #333333;
+            --text-light: #888888;
+            --primary-blue: #546ded;
+            --success-green: #27ae60;
+            --danger-red: #e74c3c;
+            --badge-new-bg: #d4edda;
+            --badge-new-text: #155724;
+            --badge-add-bg: #d1ecf1;
+            --badge-add-text: #0c5460;
+            --badge-reduce-bg: #f8d7da;
+            --badge-reduce-text: #721c24;
+            --border-color: #e8e8e8;
+            --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 24px 24px;
+            border-bottom: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-header .icon {
+            font-size: 32px;
+        }
+
+        .page-header .title {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+        }
+
+        .page-header .divider {
+            display: none;
+        }
+
+        .page-header .subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: center;
+        }
+
+        .page-header .subtitle .small-icon {
+            display: none;
+        }
+
+        .page-header .subtitle span {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .etf-tabs-container {
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 8px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-light);
+        }
+
+        .etf-tabs {
+            display: flex;
+            gap: 8px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .etf-tab {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: -2px;
+        }
+
+        .etf-tab:hover {
+            color: var(--primary-blue);
+        }
+
+        .etf-tab.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+
+        .changes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .change-card {
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-blue);
+            padding: 20px;
+            box-shadow: var(--shadow-light);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .change-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .change-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .change-card-stock {
+            flex: 1;
+        }
+
+        .change-card-code {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 4px;
+        }
+
+        .change-card-name {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .change-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-new {
+            background-color: var(--badge-new-bg);
+            color: var(--badge-new-text);
+        }
+
+        .badge-increase {
+            background-color: var(--badge-add-bg);
+            color: var(--badge-add-text);
+        }
+
+        .badge-decrease {
+            background-color: var(--badge-reduce-bg);
+            color: var(--badge-reduce-text);
+        }
+
+        .change-card-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .positive {
+            color: var(--success-green);
+        }
+
+        .negative {
+            color: var(--danger-red);
+        }
+
+        .no-changes {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+            font-size: 16px;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: transparent;
+            color: var(--primary-blue);
+            border: 1px solid var(--primary-blue);
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 24px;
+        }
+
+        .back-button:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .detail-header {
+            margin-bottom: 24px;
+            padding: 20px;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            box-shadow: var(--shadow-light);
+        }
+
+        .detail-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 16px;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+        }
+
+        .stat-box {
+            padding: 16px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .stat-box .stat-label {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        .stat-box .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .detail-etf-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .detail-etf-tab {
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-dark);
+        }
+
+        .detail-etf-tab:hover {
+            border-color: var(--primary-blue);
+        }
+
+        .detail-etf-tab.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        .history-table {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow-light);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f8f9fa;
+        }
+
+        th {
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-dark);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-new {
+            background: var(--badge-new-bg);
+            color: var(--badge-new-text);
+        }
+
+        .status-increase {
+            background: var(--badge-add-bg);
+            color: var(--badge-add-text);
+        }
+
+        .status-decrease {
+            background: var(--badge-reduce-bg);
+            color: var(--badge-reduce-text);
+        }
+
+        .status-unchanged {
+            background: #e8e8e8;
+            color: var(--text-light);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .mode-tabs-container {
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 24px;
+        }
+
+        .mode-tabs {
+            display: flex;
+            gap: 8px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .mode-tab {
+            padding: 14px 24px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .mode-tab:hover {
+            color: var(--primary-blue);
+        }
+
+        .mode-tab.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+
+        .search-container {
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-light);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 20px;
+            font-size: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: white;
+            color: var(--text-dark);
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(84, 109, 237, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-light);
+        }
+
+        .stock-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .stock-item {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .stock-item:hover {
+            border-color: var(--primary-blue);
+            box-shadow: var(--shadow-light);
+            transform: translateX(4px);
+        }
+
+        .stock-item-code {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            min-width: 80px;
+        }
+
+        .stock-item-name {
+            font-size: 15px;
+            color: var(--text-dark);
+        }
+
+        .stock-item-meta {
+            margin-left: auto;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+            font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .page-header .divider {
+                display: none;
+            }
+
+            .changes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .etf-tabs {
+                flex-direction: column;
+            }
+
+            .etf-tab {
+                width: 100%;
+                text-align: left;
+            }
+
+            .history-table {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <div class="title" id="headerTitle">🏛️ ETF持股分析平台</div>
+        <div class="subtitle" id="headerSubtitle">
+            <span>最新更新: 2025/11/07</span>
+            <span>•</span>
+            <span>資料來源: 群益、野村、統一</span>
+        </div>
+    </div>
+
+    <div class="mode-tabs-container">
+        <div class="mode-tabs">
+            <button class="mode-tab active" data-mode="changes">異動明細</button>
+            <button class="mode-tab" data-mode="search">股票查詢</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Changes Mode -->
+        <div id="changesMode">
+            <div class="etf-tabs-container">
+                <div class="etf-tabs" id="etfTabs"></div>
+            </div>
+            
+            <div class="changes-grid" id="changesGrid"></div>
+        </div>
+
+        <!-- Search Mode -->
+        <div id="searchMode" class="hidden">
+            <div class="search-container">
+                <input type="text" 
+                       class="search-input" 
+                       id="searchInput" 
+                       placeholder="搜尋股票代碼或名稱... 例如: 2330、台積電">
+            </div>
+            <div class="stock-list" id="stockList"></div>
+        </div>
+
+        <!-- Detail Page -->
+        <div id="detailPage" class="hidden">
+            <button class="back-button" id="backButton">
+                ← 返回
+            </button>
+            
+            <div class="detail-header">
+                <h2 class="detail-title" id="detailTitle"></h2>
+                <div class="stats-row" id="statsRow"></div>
+            </div>
+            
+            <div class="detail-etf-tabs" id="detailEtfTabs"></div>
+            
+            <div class="history-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>持股 (張)</th>
+                            <th>權重 (%)</th>
+                            <th>張數變動</th>
+                            <th>權重變動</th>
+                            <th>狀態</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ETF List Data
+        const etfList = [
+            { code: "00981A", name: "統一台股增長" },
+            { code: "00980A", name: "野村智慧優選" },
+            { code: "00982A", name: "群益強棒" }
+        ];
+
+        // Daily changes data for each ETF
+        const dailyChanges = {
+            "00981A": [
+                {
+                    code: "1319",
+                    name: "東陽",
+                    type: "新增",
+                    current_count: 573,
+                    current_weight: 0.20,
+                    count_change: 573,
+                    weight_change: 0.20
+                },
+                {
+                    code: "2027",
+                    name: "大成鋼",
+                    type: "增持",
+                    current_count: 1489,
+                    current_weight: 0.85,
+                    count_change: 69,
+                    weight_change: 0.04
+                },
+                {
+                    code: "2330",
+                    name: "台積電",
+                    type: "增持",
+                    current_count: 5280,
+                    current_weight: 8.52,
+                    count_change: 120,
+                    weight_change: 0.15
+                },
+                {
+                    code: "2891",
+                    name: "中信金",
+                    type: "減持",
+                    current_count: 4520,
+                    current_weight: 3.25,
+                    count_change: -100,
+                    weight_change: -0.08
+                }
+            ],
+            "00980A": [
+                {
+                    code: "2330",
+                    name: "台積電",
+                    type: "增持",
+                    current_count: 5140,
+                    current_weight: 7.89,
+                    count_change: 100,
+                    weight_change: 0.18
+                },
+                {
+                    code: "1319",
+                    name: "東陽",
+                    type: "新增",
+                    current_count: 2400,
+                    current_weight: 1.85,
+                    count_change: 2400,
+                    weight_change: 1.85
+                },
+                {
+                    code: "2891",
+                    name: "中信金",
+                    type: "增持",
+                    current_count: 4000,
+                    current_weight: 2.98,
+                    count_change: 80,
+                    weight_change: 0.12
+                }
+            ],
+            "00982A": [
+                {
+                    code: "2330",
+                    name: "台積電",
+                    type: "增持",
+                    current_count: 5000,
+                    current_weight: 8.12,
+                    count_change: 150,
+                    weight_change: 0.22
+                },
+                {
+                    code: "1303",
+                    name: "南亞塑膠",
+                    type: "新增",
+                    current_count: 3200,
+                    current_weight: 4.15,
+                    count_change: 3200,
+                    weight_change: 4.15
+                },
+                {
+                    code: "1210",
+                    name: "大成鋼",
+                    type: "減持",
+                    current_count: 2800,
+                    current_weight: 2.52,
+                    count_change: -50,
+                    weight_change: -0.05
+                }
+            ]
+        };
+
+        const stockHistoryData = [
+            {
+                code: "2330",
+                name: "台積電",
+                etf_count: 3,
+                total_shares: 15420,
+                etf_holdings: {
+                    "00981A": [
+                        { date: "2025/11/07", shares: 5280, weight: 8.52, shares_change: 120, weight_change: 0.15, status: "increase" },
+                        { date: "2025/10/31", shares: 5160, weight: 8.37, shares_change: 0, weight_change: 0, status: "unchanged" },
+                        { date: "2025/10/24", shares: 5160, weight: 8.35, shares_change: -80, weight_change: -0.12, status: "decrease" }
+                    ],
+                    "00980A": [
+                        { date: "2025/11/07", shares: 5140, weight: 7.89, shares_change: 100, weight_change: 0.18, status: "increase" },
+                        { date: "2025/10/31", shares: 5040, weight: 7.71, shares_change: 0, weight_change: 0, status: "unchanged" }
+                    ],
+                    "00982A": [
+                        { date: "2025/11/07", shares: 5000, weight: 8.12, shares_change: 150, weight_change: 0.22, status: "increase" },
+                        { date: "2025/10/31", shares: 4850, weight: 7.90, shares_change: 50, weight_change: 0.08, status: "increase" }
+                    ]
+                }
+            },
+            {
+                code: "2891",
+                name: "中信金",
+                etf_count: 2,
+                total_shares: 8520,
+                etf_holdings: {
+                    "00981A": [
+                        { date: "2025/11/07", shares: 4520, weight: 3.25, shares_change: -100, weight_change: -0.08, status: "decrease" },
+                        { date: "2025/10/31", shares: 4620, weight: 3.33, shares_change: 0, weight_change: 0, status: "unchanged" }
+                    ],
+                    "00980A": [
+                        { date: "2025/11/07", shares: 4000, weight: 2.98, shares_change: 80, weight_change: 0.12, status: "increase" },
+                        { date: "2025/10/31", shares: 3920, weight: 2.86, shares_change: 0, weight_change: 0, status: "unchanged" }
+                    ]
+                }
+            },
+            {
+                code: "1303",
+                name: "南亞塑膠",
+                etf_count: 1,
+                total_shares: 3200,
+                etf_holdings: {
+                    "00982A": [
+                        { date: "2025/11/07", shares: 3200, weight: 4.15, shares_change: 0, weight_change: 0, status: "new" },
+                        { date: "2025/10/31", shares: 3200, weight: 4.15, shares_change: 200, weight_change: 0.25, status: "increase" }
+                    ]
+                }
+            },
+            {
+                code: "1210",
+                name: "大成鋼",
+                etf_count: 2,
+                total_shares: 5600,
+                etf_holdings: {
+                    "00981A": [
+                        { date: "2025/11/07", shares: 2800, weight: 2.45, shares_change: 100, weight_change: 0.08, status: "increase" },
+                        { date: "2025/10/31", shares: 2700, weight: 2.37, shares_change: 0, weight_change: 0, status: "unchanged" }
+                    ],
+                    "00982A": [
+                        { date: "2025/11/07", shares: 2800, weight: 2.52, shares_change: -50, weight_change: -0.05, status: "decrease" },
+                        { date: "2025/10/31", shares: 2850, weight: 2.57, shares_change: 0, weight_change: 0, status: "unchanged" }
+                    ]
+                }
+            },
+            {
+                code: "1319",
+                name: "東陽",
+                etf_count: 1,
+                total_shares: 2400,
+                etf_holdings: {
+                    "00980A": [
+                        { date: "2025/11/07", shares: 2400, weight: 1.85, shares_change: 0, weight_change: 0, status: "unchanged" },
+                        { date: "2025/10/31", shares: 2400, weight: 1.85, shares_change: 150, weight_change: 0.12, status: "increase" }
+                    ]
+                }
+            }
+        ];
+
+        // State management
+        let currentStock = null;
+        let currentETF = "00981A";
+        let selectedDetailETF = null;
+        let currentMode = "changes";
+
+        // Initialize app
+        function init() {
+            renderETFTabs();
+            renderChanges();
+            renderStockList();
+            setupEventListeners();
+            setupModeListeners();
+            setupSearchListener();
+        }
+
+        // Setup mode switching
+        function setupModeListeners() {
+            const modeTabs = document.querySelectorAll('.mode-tab');
+            modeTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const mode = tab.getAttribute('data-mode');
+                    switchMode(mode);
+                });
+            });
+        }
+
+        // Switch between modes
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            // Update tab active state
+            document.querySelectorAll('.mode-tab').forEach(tab => {
+                if (tab.getAttribute('data-mode') === mode) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+
+            // Update header
+            const headerTitle = document.getElementById('headerTitle');
+            const headerSubtitle = document.getElementById('headerSubtitle');
+
+            if (mode === 'changes') {
+                headerTitle.textContent = '🏛️ ETF持股分析平台';
+                headerSubtitle.innerHTML = '<span>最新更新: 2025/11/07</span><span>•</span><span>資料來源: 群益、野村、統一</span>';
+                document.getElementById('changesMode').classList.remove('hidden');
+                document.getElementById('searchMode').classList.add('hidden');
+            } else {
+                headerTitle.textContent = '🏛️ ETF持股分析平台';
+                headerSubtitle.innerHTML = '<span>最新更新: 2025/11/07</span><span>•</span><span>資料來源: 群益、野村、統一</span>';
+                document.getElementById('changesMode').classList.add('hidden');
+                document.getElementById('searchMode').classList.remove('hidden');
+            }
+        }
+
+        // Render stock list
+        function renderStockList(filter = '') {
+            const stockListContainer = document.getElementById('stockList');
+            stockListContainer.innerHTML = '';
+
+            const filteredStocks = stockHistoryData.filter(stock => {
+                const searchTerm = filter.toLowerCase();
+                return stock.code.toLowerCase().includes(searchTerm) || 
+                       stock.name.toLowerCase().includes(searchTerm);
+            });
+
+            if (filteredStocks.length === 0) {
+                stockListContainer.innerHTML = '<div class="no-results">找不到符合的股票</div>';
+                return;
+            }
+
+            filteredStocks.forEach(stock => {
+                const item = document.createElement('div');
+                item.className = 'stock-item';
+                item.innerHTML = `
+                    <div class="stock-item-code">${stock.code}</div>
+                    <div class="stock-item-name">${stock.name}</div>
+                    <div class="stock-item-meta">${stock.etf_count} 個ETF持有</div>
+                `;
+                item.addEventListener('click', () => {
+                    showStockDetail(stock);
+                });
+                stockListContainer.appendChild(item);
+            });
+        }
+
+        // Setup search listener
+        function setupSearchListener() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', (e) => {
+                renderStockList(e.target.value);
+            });
+        }
+
+        // Render ETF tabs
+        function renderETFTabs() {
+            const tabsContainer = document.getElementById('etfTabs');
+            tabsContainer.innerHTML = '';
+
+            etfList.forEach(etf => {
+                const tab = document.createElement('button');
+                tab.className = 'etf-tab';
+                if (etf.code === currentETF) {
+                    tab.classList.add('active');
+                }
+                tab.textContent = `${etf.code} ${etf.name}`;
+                tab.addEventListener('click', () => {
+                    currentETF = etf.code;
+                    renderETFTabs();
+                    renderChanges();
+                });
+                tabsContainer.appendChild(tab);
+            });
+        }
+
+        // Render daily changes
+        function renderChanges() {
+            const changesContainer = document.getElementById('changesGrid');
+            changesContainer.innerHTML = '';
+
+            const changes = dailyChanges[currentETF] || [];
+
+            if (changes.length === 0) {
+                changesContainer.innerHTML = '<div class="no-changes">無異動資料</div>';
+                return;
+            }
+
+            changes.forEach(change => {
+                const card = document.createElement('div');
+                card.className = 'change-card';
+                
+                let badgeClass = 'badge-new';
+                if (change.type === '增持') badgeClass = 'badge-increase';
+                if (change.type === '減持') badgeClass = 'badge-decrease';
+
+                const countChangeClass = change.count_change > 0 ? 'positive' : change.count_change < 0 ? 'negative' : '';
+                const weightChangeClass = change.weight_change > 0 ? 'positive' : change.weight_change < 0 ? 'negative' : '';
+                const countSign = change.count_change > 0 ? '+' : '';
+                const weightSign = change.weight_change > 0 ? '+' : '';
+
+                card.innerHTML = `
+                    <div class="change-card-header">
+                        <div class="change-card-stock">
+                            <div class="change-card-code">${change.code}</div>
+                            <div class="change-card-name">${change.name}</div>
+                        </div>
+                        <span class="change-badge ${badgeClass}">${change.type}</span>
+                    </div>
+                    <div class="change-card-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">今日持股</div>
+                            <div class="stat-value">${change.current_count.toLocaleString()}張</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">今日權重</div>
+                            <div class="stat-value">${change.current_weight.toFixed(2)}%</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">張數變動</div>
+                            <div class="stat-value ${countChangeClass}">${countSign}${change.count_change.toLocaleString()}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">權重變動</div>
+                            <div class="stat-value ${weightChangeClass}">${weightSign}${change.weight_change.toFixed(2)}%</div>
+                        </div>
+                    </div>
+                `;
+                
+                card.addEventListener('click', () => {
+                    const stockData = stockHistoryData.find(s => s.code === change.code);
+                    if (stockData) {
+                        showStockDetail(stockData);
+                    }
+                });
+                
+                changesContainer.appendChild(card);
+            });
+        }
+
+        // Show stock detail page
+        function showStockDetail(stock) {
+            currentStock = stock;
+            const etfKeys = Object.keys(stock.etf_holdings);
+            selectedDetailETF = etfKeys[0];
+
+            document.getElementById('changesMode').classList.add('hidden');
+            document.getElementById('searchMode').classList.add('hidden');
+            document.getElementById('detailPage').classList.remove('hidden');
+
+            document.getElementById('detailTitle').textContent = `${stock.code} ${stock.name}`;
+
+            // Render stats
+            const statsRow = document.getElementById('statsRow');
+            statsRow.innerHTML = `
+                <div class="stat-box">
+                    <div class="stat-label">持有ETF數量</div>
+                    <div class="stat-value">${stock.etf_count}</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">當前總持股</div>
+                    <div class="stat-value">${stock.total_shares.toLocaleString()}張</div>
+                </div>
+            `;
+
+            // Render detail ETF tabs
+            renderDetailETFTabs(etfKeys);
+
+            // Render history table
+            renderHistoryTable();
+        }
+
+        // Render detail ETF tabs
+        function renderDetailETFTabs(etfKeys) {
+            const tabsContainer = document.getElementById('detailEtfTabs');
+            tabsContainer.innerHTML = '';
+
+            etfKeys.forEach(etfCode => {
+                const etfInfo = etfList.find(e => e.code === etfCode);
+                const tab = document.createElement('button');
+                tab.className = 'detail-etf-tab';
+                if (etfCode === selectedDetailETF) {
+                    tab.classList.add('active');
+                }
+                tab.textContent = `${etfCode} - ${etfInfo ? etfInfo.name : ''}`;
+                tab.addEventListener('click', () => {
+                    selectedDetailETF = etfCode;
+                    renderDetailETFTabs(etfKeys);
+                    renderHistoryTable();
+                });
+                tabsContainer.appendChild(tab);
+            });
+        }
+
+        // Render history table
+        function renderHistoryTable() {
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+
+            const history = currentStock.etf_holdings[selectedDetailETF];
+
+            if (!history || history.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 32px;">無歷史資料</td></tr>';
+                return;
+            }
+
+            history.forEach(record => {
+                const changeClass = record.shares_change > 0 ? 'positive' : 
+                                   record.shares_change < 0 ? 'negative' : '';
+                const weightChangeClass = record.weight_change > 0 ? 'positive' : 
+                                         record.weight_change < 0 ? 'negative' : '';
+                const sharesChangeSign = record.shares_change > 0 ? '+' : '';
+                const weightChangeSign = record.weight_change > 0 ? '+' : '';
+
+                let statusClass = 'status-unchanged';
+                let statusText = '持平';
+                if (record.status === 'new') {
+                    statusClass = 'status-new';
+                    statusText = '新增';
+                } else if (record.status === 'increase') {
+                    statusClass = 'status-increase';
+                    statusText = '增加';
+                } else if (record.status === 'decrease') {
+                    statusClass = 'status-decrease';
+                    statusText = '減少';
+                }
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.date}</td>
+                    <td>${record.shares.toLocaleString()}</td>
+                    <td>${record.weight.toFixed(2)}</td>
+                    <td class="${changeClass}">${sharesChangeSign}${record.shares_change}</td>
+                    <td class="${weightChangeClass}">${weightChangeSign}${record.weight_change.toFixed(2)}</td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Back button
+            document.getElementById('backButton').addEventListener('click', () => {
+                document.getElementById('detailPage').classList.add('hidden');
+                if (currentMode === 'changes') {
+                    document.getElementById('changesMode').classList.remove('hidden');
+                } else {
+                    document.getElementById('searchMode').classList.remove('hidden');
+                }
+                currentStock = null;
+                selectedDetailETF = null;
+            });
+        }
+
+        // Start the app
+        init();
+    </script>
+</body>
+</html>
