@@ -76,46 +76,35 @@ body {font-family: 'Segoe UI', Tahoma; background: #f9fbfc; color: #333;}
 .etf-price-change.negative {color: #e74c3c;}
 .etf-price-change.positive {color: #27ae60;}
 
-/* 改為縱向排列 */
-.changes-list {display: flex; flex-direction: column; gap: 12px;}
+/* 回到卡片網格式 */
+.changes-grid {display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px;}
 .change-card {
     background: white;
     border-left: 4px solid #546ded;
-    border-radius: 6px;
-    padding: 15px;
+    border-radius: 8px;
+    padding: 16px;
     cursor: pointer;
     transition: all 0.2s;
     border: 1px solid #f0f0f0;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
-.change-card:hover {box-shadow: 0 4px 12px rgba(84, 110, 237, 0.15); transform: translateX(4px);}
+.change-card:hover {box-shadow: 0 6px 16px rgba(84, 110, 237, 0.15); transform: translateY(-3px);}
 
-.change-card-left {flex: 1;}
-.change-code {font-size: 16px; font-weight: bold; color: #222;}
-.change-name {font-size: 12px; color: #888; margin-top: 2px;}
+.change-card-header {display: flex; justify-content: space-between; align-items: start; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;}
+.change-code {font-size: 18px; font-weight: bold; color: #222;}
+.change-name {font-size: 12px; color: #888; margin-top: 3px;}
 
-.change-card-middle {
-    flex: 2;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
-    margin: 0 20px;
-}
-
-.stat-inline {text-align: center;}
-.stat-inline-label {font-size: 11px; color: #999;}
-.stat-inline-value {font-size: 14px; font-weight: bold; color: #222; margin-top: 4px;}
-.stat-inline-value.positive {color: #27ae60;}
-.stat-inline-value.negative {color: #e74c3c;}
-
-.change-card-right {text-align: right;}
-.badge {display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;}
+.badge {display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;}
 .badge.new {background: #d4edda; color: #155724;}
 .badge.add {background: #d1ecf1; color: #0c5460;}
 .badge.reduce {background: #f8d7da; color: #721c24;}
+
+.change-stats {display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;}
+.stat-item {background: #f9fbfc; padding: 12px; border-radius: 6px;}
+.stat-label {font-size: 12px; color: #999; margin-bottom: 4px;}
+.stat-value {font-size: 15px; font-weight: bold; color: #222;}
+.stat-value.positive {color: #27ae60;}
+.stat-value.negative {color: #e74c3c;}
 
 .search-box {margin-bottom: 20px;}
 .search-box input {width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;}
@@ -195,7 +184,7 @@ tr:hover {background: #fafbfc;}
             <button class="etf-tab" onclick="switchETF('00982A')">00982A 群益強棒</button>
         </div>
         <div id="etfPriceInfo"></div>
-        <div id="changesGrid" class="changes-list"></div>
+        <div id="changesGrid" class="changes-grid"></div>
     </div>
 
     <!-- 股票查詢模式 -->
@@ -288,7 +277,7 @@ function renderChanges() {
     grid.innerHTML = '';
     
     if (!data.daily_changes || data.daily_changes.length === 0) {
-        grid.innerHTML = '<p style="color:#999;">今日無異動資料</p>';
+        grid.innerHTML = '<p style="color:#999;grid-column:1/-1;">今日無異動資料</p>';
         return;
     }
     
@@ -302,36 +291,35 @@ function renderChanges() {
         const weightChangeStr = change.weight_change >= 0 ? '+' : '';
         
         card.innerHTML = `
-            <div class="change-card-left">
-                <div class="change-code">${change.code}</div>
-                <div class="change-name">${change.name}</div>
+            <div class="change-card-header">
+                <div>
+                    <div class="change-code">${change.code}</div>
+                    <div class="change-name">${change.name}</div>
+                </div>
+                <span class="badge ${badgeClass}">${change.type}</span>
             </div>
             
-            <div class="change-card-middle">
-                <div class="stat-inline">
-                    <div class="stat-inline-label">今日持股</div>
-                    <div class="stat-inline-value">${formatNumber(change.current_count)}</div>
+            <div class="change-stats">
+                <div class="stat-item">
+                    <div class="stat-label">今日持股</div>
+                    <div class="stat-value">${formatNumber(change.current_count)}</div>
                 </div>
-                <div class="stat-inline">
-                    <div class="stat-inline-label">今日權重</div>
-                    <div class="stat-inline-value">${change.current_weight.toFixed(2)}%</div>
+                <div class="stat-item">
+                    <div class="stat-label">今日權重</div>
+                    <div class="stat-value">${change.current_weight.toFixed(2)}%</div>
                 </div>
-                <div class="stat-inline">
-                    <div class="stat-inline-label">張數變動</div>
-                    <div class="stat-inline-value ${change.count_change > 0 ? 'positive' : 'negative'}">
+                <div class="stat-item">
+                    <div class="stat-label">張數變動</div>
+                    <div class="stat-value ${change.count_change > 0 ? 'positive' : 'negative'}">
                         ${countChangeStr}${formatNumber(change.count_change)}
                     </div>
                 </div>
-                <div class="stat-inline">
-                    <div class="stat-inline-label">權重變動</div>
-                    <div class="stat-inline-value ${change.weight_change > 0 ? 'positive' : 'negative'}">
+                <div class="stat-item">
+                    <div class="stat-label">權重變動</div>
+                    <div class="stat-value ${change.weight_change > 0 ? 'positive' : 'negative'}">
                         ${weightChangeStr}${change.weight_change.toFixed(2)}%
                     </div>
                 </div>
-            </div>
-            
-            <div class="change-card-right">
-                <span class="badge ${badgeClass}">${change.type}</span>
             </div>
         `;
         grid.appendChild(card);
@@ -381,7 +369,6 @@ function showStockDetail(stockCode, etfCode) {
         <div class="stat-box"><div class="stat-box-value">${formatNumber(totalCount)}</div><div class="stat-box-label">當前總持股</div></div>
     `;
     
-    // 建立ETF分頁
     const tabsDetail = document.getElementById('etfTabsDetail');
     tabsDetail.innerHTML = '';
     Object.entries(stock.etf_holdings).forEach(([etfCode, etfData]) => {
