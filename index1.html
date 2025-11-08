@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>ETF持股分析平台</title>
+    <style>
+body{font-family:'Segoe UI',Tahoma; background:#f7f7fa; color:#222; margin:0;}
+.header{
+    background:linear-gradient(120deg,#7964e7 0%,#53a0e2 100%);
+    color:white;padding:35px 0 20px 0;font-weight:500;text-align:center;}
+.header h1{font-size:2.3rem;margin:0;}
+.header p{margin:10px 0 0 0;font-size:1.08rem;}
+.update{color:#e3eaea;font-size:1.04rem;font-weight:400;margin-top:7px;}
+.container{max-width:1200px;margin:0 auto;padding:0 20px;}
+.etf-cards{display:flex;gap:24px;justify-content:center;margin-bottom:32px;}
+.etf-card{flex:1;background:white;border-radius:15px;padding:27px 32px;margin:0 2px 0 2px;
+box-shadow:0 3px 14px rgba(112,100,225,.08);}
+.etf-code{font-size:28px;font-weight:bold;color:#546ded;}
+.etf-name{font-size:16px;color:#444;margin-bottom:10px;}
+.etf-price{font-size:37px;font-weight:bold;color:#1c2336;margin-bottom:2px;}
+.etf-change{font-size:17px;margin-top:8px;}
+.etf-change.negative{color:#e74c3c;}
+.etf-change.positive{color:#27ae60;}
+.search-box{background:white;padding:16px 28px 12px 28px;border-radius:8px;
+    box-shadow:0 1px 4px rgba(0,0,0,.07);margin-bottom:20px;}
+#searchInput{width:99%;padding:11px;font-size:16px;border-radius:6px;border:1px solid #ddd;}
+.stocks-list{background:white;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+.stock-item{padding:17px 26px 10px 26px;border-bottom:1px solid #f0f1f7;cursor:pointer;}
+.stock-item:hover{background-color:#f9fbfe;}
+.stock-code{font-weight:bold;color:#5774e7;font-size:20px;}
+.stock-name{color:#555;font-size:16px;margin-top:0;}
+.detail-page{display:none;}
+.detail-page.active{display:block;}
+.back-btn{background:#546ded;color:white;border:none;padding:12px 21px;border-radius:5px;
+    cursor:pointer;margin-bottom:24px;font-size:15px;}
+.back-btn:hover{background:#714ba2;}
+.stock-header{background:white;padding:22px;border-radius:9px;margin-bottom:21px;
+    box-shadow:0 2px 10px rgba(140,140,240,.08);}
+.stock-title{font-size:25px;font-weight:bold;color:#222;}
+.stats{display:flex;gap:30px;margin:14px 0 8px 0;}
+.stat-box{background:#f0f4fe;padding:15px 22px;border-radius:7px;text-align:center;flex:1;}
+.stat-value{font-size:23px;font-weight:bold;color:#546ded;}
+.stat-label{font-size:13px;color:#888;margin-top:2px;}
+.etf-tabs{display:flex;gap:11px;margin-bottom:14px;border-bottom:2px solid #e9e9f2;}
+.etf-tab{padding:11px 20px;cursor:pointer;background:none;border:none;border-bottom:3px solid transparent;
+color:#888;font-size:16px;}
+.etf-tab.active{color:#546ded;border-bottom-color:#546ded;}
+.etf-tab:hover{color:#546ded;}
+.history-table{background:white;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.07);}
+table{width:100%;border-collapse:collapse;}
+th{background-color:#f5f7fa;padding:12px;text-align:left;font-weight:600;font-size:14px;color:#333;border-bottom:2px solid #eee;}
+td{padding:12px;border-bottom:1px solid #eee;font-size:15px;}
+tr:hover{background-color:#f6f9fd;}
+.status-new{background:#d4edda;color:#155724;padding:3px 7px;border-radius:3px;font-size:13px;}
+.status-add{background:#d1ecf1;color:#0c5460;padding:3px 7px;border-radius:3px;font-size:13px;}
+.status-reduce{background:#f8d7da;color:#721c24;padding:3px 7px;border-radius:3px;font-size:13px;}
+.positive{color:#27ae60;}
+.negative{color:#e74c3c;}
+@media(max-width:950px){.etf-cards{flex-direction:column;gap:15px;margin-top:0;}}
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>
+        🏛️ ETF持股分析平台 <span style="font-size:13px;font-weight:500;
+        color:#dedafc;background:#7b70c6;border-radius:7px;padding:1.5px 9px;margin-left:8px;">
+        v2.0</span>
+    </h1>
+    <p class="update" id="updateTime"></p>
+    <p style="font-weight:400;margin-top:8px;">資料來源: 群益、野村</p>
+</div>
+<div id="mainPage" class="main-page">
+    <div class="container">
+        <div class="etf-cards" id="etfCards"></div>
+        <div class="search-box"><input type="text" id="searchInput" placeholder="搜尋股票代碼或名稱... 例如：2330、台積電"></div>
+        <div class="stocks-list" id="stocksList"></div>
+    </div>
+</div>
+<div id="detailPage" class="detail-page">
+    <div class="container">
+        <button class="back-btn" onclick="backToMain()">← 返回儀表板</button>
+        <div class="stock-header">
+            <div class="stock-title" id="detailTitle"></div>
+            <div class="stats" id="statsContainer"></div>
+            <div class="etf-tabs" id="etfTabs"></div>
+        </div>
+        <div class="history-table">
+            <table id="historyTable">
+                <thead>
+                    <tr>
+                        <th>日期</th>
+                        <th>持股(張)</th>
+                        <th>權重(%)</th>
+                        <th>張數變動</th>
+                        <th>權重變動</th>
+                        <th>狀態</th>
+                    </tr>
+                </thead>
+                <tbody id="historyBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+let stockData = {};
+let processedData = {};
+let currentStock = null;
+let currentETF = null;
+
+function renderMainPage() {
+    // ETF三黨卡片
+    const container = document.getElementById('etfCards');
+    container.innerHTML = '';
+    if (Object.keys(processedData).length === 0) {
+        container.innerHTML = '<p style="color:#999;padding:19px;">請先上傳 stock_history_data.json 與 processed_etf_data.json 至儲存庫根目錄</p>';
+        return;
+    }
+    for (const [code, data] of Object.entries(processedData)) {
+        const card = document.createElement('div');
+        card.className = 'etf-card';
+        const changeNum = parseFloat(data.change_value || 0);
+        const changeClass = changeNum < 0 ? 'negative' : 'positive';
+        card.innerHTML = `
+            <div class="etf-code">${code}</div>
+            <div class="etf-name">${data.name}</div>
+            <div class="etf-price">$${data.price}</div>
+            <div class="etf-change ${changeClass}">
+                ${changeNum >= 0 ? '▲' : '▼'} ${data.change_value} (${data.change_percent})
+            </div>
+        `;
+        container.appendChild(card);
+    }
+    renderStockList(Object.values(stockData));
+}
+
+function renderStockList(stocks) {
+    const list = document.getElementById('stocksList');
+    list.innerHTML = '';
+    if (stocks.length === 0) {
+        list.innerHTML = '<p style="padding:20px;color:#999;">暫無股票數據，請確認已上傳最新資料</p>';
+        return;
+    }
+    stocks.slice(0, 80).forEach(stock => {
+        const item = document.createElement('div');
+        item.className = 'stock-item';
+        item.innerHTML = `<div class="stock-code">${stock.code}</div>
+            <div class="stock-name">${stock.name || ""}</div>`;
+        item.onclick = () => showStockDetail(stock.code);
+        list.appendChild(item);
+    });
+}
+
+function showStockDetail(stockCode) {
+    if (!stockData[stockCode]) { alert('股票不存在'); return; }
+    currentStock = stockCode;
+    const stock = stockData[stockCode];
+    document.getElementById('mainPage').style.display = 'none';
+    document.getElementById('detailPage').classList.add('active');
+    document.getElementById('detailTitle').textContent = `${stock.code} ${stock.name || ""}`;
+    const etfCount = Object.keys(stock.etf_holdings).length;
+    const totalCount = Object.values(stock.etf_holdings)
+        .reduce((sum, etf) => sum + (etf.current_count || 0), 0);
+    document.getElementById('statsContainer').innerHTML = `
+        <div class="stat-box"><div class="stat-value">${etfCount}</div><div class="stat-label">持有ETF數量</div></div>
+        <div class="stat-box"><div class="stat-value">${totalCount.toLocaleString()}</div><div class="stat-label">當前總持股</div></div>
+    `;
+    const tabsContainer = document.getElementById('etfTabs');
+    tabsContainer.innerHTML = '';
+    Object.entries(stock.etf_holdings).forEach(([etfCode, etfData]) => {
+        const btn = document.createElement('button');
+        btn.className = 'etf-tab' + (currentETF === etfCode ? ' active' : '');
+        btn.textContent = `${etfCode} ${etfData.etf_name}`;
+        btn.onclick = () => switchETF(etfCode);
+        tabsContainer.appendChild(btn);
+    });
+    const firstETF = Object.keys(stock.etf_holdings)[0];
+    switchETF(firstETF);
+}
+
+function switchETF(etfCode) {
+    currentETF = etfCode;
+    document.querySelectorAll('.etf-tab').forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.textContent.startsWith(etfCode)) tab.classList.add('active');
+    });
+    const stock = stockData[currentStock];
+    const etfData = stock.etf_holdings[etfCode];
+    if (!etfData || !etfData.history) {
+        document.getElementById('historyBody').innerHTML = '<tr><td colspan="6">暫無歷史數據</td></tr>';
+        return;
+    }
+    let html = '';
+    etfData.history.forEach(record => {
+        const changeClass = record.count_change > 0 ? 'positive' : record.count_change < 0 ? 'negative' : '';
+        const statusClass = record.status === '首次出現' ? 'status-new' :
+                           record.status === '增持' ? 'status-add' : record.status === '出清' ? 'status-reduce' :'';
+        html += `<tr>
+            <td>${record.date}</td>
+            <td>${record.count.toLocaleString()}</td>
+            <td>${record.weight.toFixed(2)}%</td>
+            <td class="${changeClass}">${record.count_change >= 0 ? '+' : ''}${record.count_change.toLocaleString()}</td>
+            <td class="${changeClass}">${record.weight_change >= 0 ? '+' : ''}${record.weight_change.toFixed(2)}%</td>
+            <td><span class="${statusClass}">${record.status}</span></td>
+        </tr>`;
+    });
+    document.getElementById('historyBody').innerHTML = html;
+}
+
+function backToMain() {
+    document.getElementById('mainPage').style.display = 'block';
+    document.getElementById('detailPage').classList.remove('active');
+    currentStock = null; currentETF = null;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    Promise.all([
+        fetch('./stock_history_data.json').then(r => r.json()),
+        fetch('./processed_etf_data.json').then(r => r.json())
+    ]).then(([sdata, pdata]) => {
+        stockData = sdata;
+        processedData = pdata;
+        // 上方日期
+        let latest = "";
+        let first = processedData[Object.keys(processedData)[0]];
+        if(first && first.latest_date){
+          latest = "最新更新: " + first.latest_date;
+          document.getElementById('updateTime').textContent = latest;
+        }
+        renderMainPage();
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const keyword = e.target.value.toLowerCase();
+            const filtered = Object.values(stockData).filter(stock =>
+                stock.code.includes(keyword) || (stock.name && stock.name.toLowerCase().includes(keyword))
+            );
+            renderStockList(filtered);
+        });
+    }).catch(e => {
+        document.getElementById('mainPage').innerHTML = `
+          <h2 style="color:red">檔案載入失敗</h2>
+          <p style="color:#999">請確認已上傳 <b>stock_history_data.json</b> 與 <b>processed_etf_data.json</b> 至儲存庫根目錄</p>
+          <pre>${e.message}</pre>
+        `;
+        console.error(e);
+    });
+});
+</script>
+</body>
+</html>
