@@ -38,6 +38,11 @@ body {font-family: 'Segoe UI', Tahoma; background: linear-gradient(135deg, #f5f7
 
 .content-box {background: white; border-radius: 8px; padding: 25px; box-shadow: 0 4px 16px rgba(0,0,0,0.08);}
 
+.etf-tabs {display: flex; gap: 15px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px; flex-wrap: wrap;}
+.etf-tab {background: none; border: none; cursor: pointer; color: #888; font-size: 14px; padding: 8px 15px; border-bottom: 3px solid transparent; transition: all 0.2s; font-weight: 500;}
+.etf-tab:hover {color: #546ded;}
+.etf-tab.active {color: #667eea; border-bottom-color: #667eea; font-weight: 600;}
+
 /* 儀表板卡片 */
 .dashboard-grid {display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 30px;}
 
@@ -91,11 +96,6 @@ body {font-family: 'Segoe UI', Tahoma; background: linear-gradient(135deg, #f5f7
 .stock-item-value {text-align: right; font-weight: 600; font-size: 13px;}
 .stock-item-value.positive {color: #27ae60;}
 .stock-item-value.negative {color: #e74c3c;}
-
-.etf-tabs {display: flex; gap: 15px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px; flex-wrap: wrap;}
-.etf-tab {background: none; border: none; cursor: pointer; color: #888; font-size: 14px; padding: 8px 15px; border-bottom: 3px solid transparent; transition: all 0.2s; font-weight: 500;}
-.etf-tab:hover {color: #546ded;}
-.etf-tab.active {color: #667eea; border-bottom-color: #667eea; font-weight: 600;}
 
 .etf-price-box {background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); border-radius: 12px; padding: 20px; margin-bottom: 25px; border-left: 5px solid #667eea;}
 .etf-price-code {font-size: 18px; font-weight: 700; color: #667eea;}
@@ -196,7 +196,6 @@ body {font-family: 'Segoe UI', Tahoma; background: linear-gradient(135deg, #f5f7
 .stock-stat-value {font-size: 15px; font-weight: 700; color: #222;}
 
 .hidden {display: none;}
-
 .no-data {color: #999; text-align: center; padding: 30px; font-size: 14px;}
     </style>
 </head>
@@ -296,21 +295,21 @@ function formatNumber(num) {
 
 function renderDashboard() {
     const data = processedData[currentETF];
-    if (!data || !data.strategy) {
-        document.getElementById('dashboardContainer').innerHTML = '<p class="no-data">無策略數據</p>';
+    if (!data) {
+        document.getElementById('dashboardContainer').innerHTML = '<p class="no-data">無數據</p>';
         return;
     }
     
-    const strategy = data.strategy;
+    const strategy = data.strategy || {};
     
     let html = `<div class="dashboard-grid">`;
     
     // 持續增持
     html += `<div class="dashboard-card increasing">
-        <div class="dashboard-card-title"><span class="dashboard-card-title-icon">📈</span> 持續布局 (${strategy.increasing.length})</div>
+        <div class="dashboard-card-title"><span class="dashboard-card-title-icon">📈</span> 持續布局 (${(strategy.increasing || []).length})</div>
         <div>`;
     
-    if (strategy.increasing.length === 0) {
+    if (!strategy.increasing || strategy.increasing.length === 0) {
         html += `<div class="no-data" style="padding: 15px 0; font-size: 13px;">無持續增持股票</div>`;
     } else {
         strategy.increasing.slice(0, 5).forEach(stock => {
@@ -323,15 +322,14 @@ function renderDashboard() {
             </div>`;
         });
     }
-    
     html += `</div></div>`;
     
     // 持續減碼
     html += `<div class="dashboard-card decreasing">
-        <div class="dashboard-card-title"><span class="dashboard-card-title-icon">📉</span> 持續減碼 (${strategy.decreasing.length})</div>
+        <div class="dashboard-card-title"><span class="dashboard-card-title-icon">📉</span> 持續減碼 (${(strategy.decreasing || []).length})</div>
         <div>`;
     
-    if (strategy.decreasing.length === 0) {
+    if (!strategy.decreasing || strategy.decreasing.length === 0) {
         html += `<div class="no-data" style="padding: 15px 0; font-size: 13px;">無持續減碼股票</div>`;
     } else {
         strategy.decreasing.slice(0, 5).forEach(stock => {
@@ -344,15 +342,14 @@ function renderDashboard() {
             </div>`;
         });
     }
-    
     html += `</div></div>`;
     
     // 新建立位置
     html += `<div class="dashboard-card new">
-        <div class="dashboard-card-title"><span class="dashboard-card-title-icon">✨</span> 新建立 (${strategy.new_positions.length})</div>
+        <div class="dashboard-card-title"><span class="dashboard-card-title-icon">✨</span> 新建立 (${(strategy.new_positions || []).length})</div>
         <div>`;
     
-    if (strategy.new_positions.length === 0) {
+    if (!strategy.new_positions || strategy.new_positions.length === 0) {
         html += `<div class="no-data" style="padding: 15px 0; font-size: 13px;">無新建立位置</div>`;
     } else {
         strategy.new_positions.slice(0, 5).forEach(stock => {
@@ -365,15 +362,14 @@ function renderDashboard() {
             </div>`;
         });
     }
-    
     html += `</div></div>`;
     
     // 已平倉
     html += `<div class="dashboard-card closed">
-        <div class="dashboard-card-title"><span class="dashboard-card-title-icon">🗑️</span> 已平倉 (${strategy.closed_positions.length})</div>
+        <div class="dashboard-card-title"><span class="dashboard-card-title-icon">🗑️</span> 已平倉 (${(strategy.closed_positions || []).length})</div>
         <div>`;
     
-    if (strategy.closed_positions.length === 0) {
+    if (!strategy.closed_positions || strategy.closed_positions.length === 0) {
         html += `<div class="no-data" style="padding: 15px 0; font-size: 13px;">無已平倉股票</div>`;
     } else {
         strategy.closed_positions.slice(0, 5).forEach(stock => {
@@ -388,7 +384,6 @@ function renderDashboard() {
     }
     
     html += `</div></div></div>`;
-    
     document.getElementById('dashboardContainer').innerHTML = html;
 }
 
@@ -470,7 +465,6 @@ function renderStockList(stocks) {
         return;
     }
     stocks.slice(0, 200).forEach(stock => {
-        const firstETF = Object.keys(stock.etf_holdings)[0];
         const etfCount = Object.keys(stock.etf_holdings).length;
         const totalCount = Object.values(stock.etf_holdings).reduce((sum, etf) => sum + (etf.current_count || 0), 0);
         
@@ -505,8 +499,9 @@ document.addEventListener('DOMContentLoaded', () => {
         processedData = pdata;
         stockData = sdata;
         
-        console.log('已加載 processed_etf_data:', Object.keys(pdata));
-        console.log('已加載 stock_history_data:', Object.keys(sdata).length, '檔股票');
+        console.log('✓ 已加載資料');
+        console.log('  ETF:', Object.keys(pdata).length);
+        console.log('  股票:', Object.keys(sdata).length);
         
         let first = processedData[Object.keys(processedData)[0]];
         if(first && first.latest_date){
@@ -526,8 +521,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }).catch(e => {
-        console.error('載入錯誤:', e);
-        alert('無法載入資料檔案，請確保 processed_etf_data.json 和 stock_history_data.json 在同目錄');
+        console.error('❌ 載入錯誤:', e);
+        document.getElementById('dashboardContainer').innerHTML = '<p class="no-data">❌ 無法載入資料檔案<br/>請確保 processed_etf_data.json 和 stock_history_data.json 在同目錄</p>';
     });
 });
 </script>
