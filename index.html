@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ETF持股分析平台</title>
+    <title>ETF持股分析平台 Pro</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
 * {margin: 0; padding: 0; box-sizing: border-box;}
-body {font-family: 'Segoe UI', Tahoma; background: #f9fbfc; color: #333;}
+body {font-family: 'Segoe UI', Tahoma; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #333; min-height: 100vh;}
 
 .gradient-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -14,174 +15,231 @@ body {font-family: 'Segoe UI', Tahoma; background: #f9fbfc; color: #333;}
     padding: 40px 20px;
     text-align: center;
     margin-bottom: 30px;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
 }
 
-.gradient-header h1 {font-size: 32px; font-weight: 600; margin-bottom: 12px;}
+.gradient-header h1 {font-size: 32px; font-weight: 700; margin-bottom: 12px;}
 .gradient-header p {font-size: 13px; opacity: 0.9; margin: 5px 0;}
 
-.container {max-width: 1200px; margin: 0 auto; padding: 0 20px;}
+.container {max-width: 1400px; margin: 0 auto; padding: 0 20px;}
 
 .tabs-container {
     background: white;
-    border-bottom: 2px solid #eee;
+    border-bottom: 3px solid #667eea;
     margin-bottom: 25px;
     border-radius: 8px 8px 0 0;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .tabs {display: flex; padding: 0;}
-
-.tab-btn {
-    flex: 0 1 150px;
-    padding: 15px 20px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #888;
-    font-size: 15px;
-    border-bottom: 3px solid transparent;
-    transition: all 0.2s;
-}
-
+.tab-btn {flex: 0 1 150px; padding: 15px 20px; background: none; border: none; cursor: pointer; color: #888; font-size: 15px; border-bottom: 3px solid transparent; transition: all 0.3s;}
 .tab-btn:hover {color: #546ded;}
-.tab-btn.active {color: #546ded; border-bottom-color: #546ded;}
+.tab-btn.active {color: white; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-bottom-color: white;}
 
-.content-box {
-    background: white;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-}
+.content-box {background: white; border-radius: 8px; padding: 25px; box-shadow: 0 4px 16px rgba(0,0,0,0.08);}
 
-.etf-tabs {display: flex; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; flex-wrap: wrap;}
-.etf-tab {background: none; border: none; cursor: pointer; color: #888; font-size: 14px; padding: 8px 15px; border-bottom: 2px solid transparent; transition: all 0.2s;}
+.etf-tabs {display: flex; gap: 15px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px; flex-wrap: wrap;}
+.etf-tab {background: none; border: none; cursor: pointer; color: #888; font-size: 14px; padding: 8px 15px; border-bottom: 3px solid transparent; transition: all 0.2s; font-weight: 500;}
 .etf-tab:hover {color: #546ded;}
-.etf-tab.active {color: #546ded; border-bottom-color: #546ded;}
+.etf-tab.active {color: #667eea; border-bottom-color: #667eea; font-weight: 600;}
 
-.etf-price-box {background: #f5f7fa; border-radius: 8px; padding: 16px; margin-bottom: 20px;}
-.etf-price-code {font-size: 18px; font-weight: bold; color: #546ded;}
-.etf-price-name {font-size: 12px; color: #888; margin-top: 2px;}
-.etf-price-value {font-size: 26px; font-weight: bold; color: #222; margin-top: 8px;}
-.etf-price-change {font-size: 14px; margin-top: 5px;}
+.etf-price-box {background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); border-radius: 12px; padding: 20px; margin-bottom: 25px; border-left: 5px solid #667eea;}
+.etf-price-code {font-size: 18px; font-weight: 700; color: #667eea;}
+.etf-price-name {font-size: 12px; color: #999; margin-top: 3px;}
+.etf-price-value {font-size: 32px; font-weight: 700; color: #222; margin-top: 10px;}
+.etf-price-change {font-size: 14px; margin-top: 8px; font-weight: 600;}
 .etf-price-change.negative {color: #e74c3c;}
 .etf-price-change.positive {color: #27ae60;}
 
-.changes-grid {display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px;}
+.changes-grid {display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px;}
 
 .change-card {
     background: white;
-    border-left: 6px solid #546ded;
-    border-radius: 8px;
-    padding: 16px;
+    border-radius: 12px;
+    padding: 20px;
     cursor: pointer;
-    transition: all 0.2s;
-    border: 1px solid #f0f0f0;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    transition: all 0.3s;
+    border: 2px solid #f0f0f0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     position: relative;
+    overflow: hidden;
 }
 
-.change-card:hover {box-shadow: 0 6px 16px rgba(84, 110, 237, 0.15); transform: translateY(-3px);}
+.change-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 4px;
+    width: 100%;
+    background: linear-gradient(90deg, #546ded, #764ba2);
+    transition: height 0.3s;
+}
 
-/* 新增邊框加粗特效 */
-.change-card.new-add {border-left: 8px solid #27ae60; box-shadow: inset 8px 0 0 -6px rgba(39, 174, 96, 0.5), 0 1px 4px rgba(0,0,0,0.05);}
-.change-card.new-add:hover {box-shadow: inset 8px 0 0 -6px rgba(39, 174, 96, 0.8), 0 6px 16px rgba(39, 174, 96, 0.2);}
+.change-card:hover {
+    box-shadow: 0 12px 32px rgba(84, 110, 237, 0.2);
+    transform: translateY(-8px);
+    border-color: #667eea;
+}
 
-/* 刪除邊框加粗特效 */
-.change-card.delete {border-left: 8px solid #e74c3c; box-shadow: inset 8px 0 0 -6px rgba(231, 76, 60, 0.5), 0 1px 4px rgba(0,0,0,0.05);}
-.change-card.delete:hover {box-shadow: inset 8px 0 0 -6px rgba(231, 76, 60, 0.8), 0 6px 16px rgba(231, 76, 60, 0.2);}
+.change-card:hover::before {height: 6px;}
 
-.change-card-header {display: flex; justify-content: space-between; align-items: start; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;}
+/* 新增狀態 - 綠色發光 */
+.change-card.new-add {
+    border: 2px solid #27ae60;
+    background: linear-gradient(135deg, rgba(39,174,96,0.05) 0%, rgba(39,174,96,0.02) 100%);
+}
+
+.change-card.new-add::before {background: linear-gradient(90deg, #27ae60, #16a34a);}
+
+.change-card.new-add:hover {
+    box-shadow: 0 12px 32px rgba(39, 174, 96, 0.25);
+    background: linear-gradient(135deg, rgba(39,174,96,0.1) 0%, rgba(39,174,96,0.05) 100%);
+}
+
+/* 刪除狀態 - 紅色發光 */
+.change-card.delete {
+    border: 2px solid #e74c3c;
+    background: linear-gradient(135deg, rgba(231,76,60,0.05) 0%, rgba(231,76,60,0.02) 100%);
+}
+
+.change-card.delete::before {background: linear-gradient(90deg, #e74c3c, #c0392b);}
+
+.change-card.delete:hover {
+    box-shadow: 0 12px 32px rgba(231, 76, 60, 0.25);
+    background: linear-gradient(135deg, rgba(231,76,60,0.1) 0%, rgba(231,76,60,0.05) 100%);
+}
+
+.change-card-header {display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;}
 .change-code-name {flex: 1;}
-.change-code {font-size: 18px; font-weight: bold; color: #222;}
-.change-name {font-size: 12px; color: #666; margin-top: 3px;}
+.change-code {font-size: 20px; font-weight: 700; color: #222;}
+.change-name {font-size: 13px; color: #999; margin-top: 2px; font-weight: 500;}
 
-.badge {display: inline-block; padding: 6px 14px; border-radius: 12px; font-size: 12px; font-weight: 600;}
-.badge.new {background: #d4edda; color: #155724; border: 2px solid #28a745; box-shadow: 0 0 12px rgba(40, 167, 69, 0.3);}
-.badge.add {background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb;}
-.badge.reduce {background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;}
-.badge.delete {background: #f8d7da; color: #721c24; border: 2px solid #dc3545; box-shadow: 0 0 12px rgba(220, 53, 69, 0.3);}
+.badge {display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700;}
+.badge.new {background: linear-gradient(135deg, #27ae60, #16a34a); color: white; box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3); animation: pulse 2s infinite;}
+.badge.add {background: #d1ecf1; color: #0c5460;}
+.badge.reduce {background: #f8d7da; color: #721c24;}
+.badge.delete {background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3); animation: pulse 2s infinite;}
 
-.change-stats {display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;}
-.stat-item {background: #f9fbfc; padding: 12px; border-radius: 6px;}
-.stat-label {font-size: 12px; color: #999; margin-bottom: 4px;}
-.stat-value {font-size: 15px; font-weight: bold; color: #222;}
+@keyframes pulse {0%, 100% {box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);} 50% {box-shadow: 0 4px 20px rgba(39, 174, 96, 0.6);}}
+
+.badge-icon {font-size: 16px;}
+
+.change-stats {display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 14px;}
+.stat-item {background: #f9fbfc; padding: 14px; border-radius: 8px; border-left: 3px solid #667eea;}
+.stat-label {font-size: 11px; color: #999; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;}
+.stat-value {font-size: 16px; font-weight: 700; color: #222;}
 .stat-value.positive {color: #27ae60;}
 .stat-value.negative {color: #e74c3c;}
 
-.search-box {margin-bottom: 20px;}
-.search-box input {width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;}
+.change-indicator {
+    display: flex;
+    gap: 3px;
+    padding: 2px 0;
+}
 
-.stocks-grid {display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px;}
+.change-indicator span {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #e0e0e0;
+}
+
+.change-indicator span.active {background: #667eea;}
+
+.search-box {margin-bottom: 20px;}
+.search-box input {width: 100%; padding: 14px 16px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; transition: all 0.2s;}
+.search-box input:focus {border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); outline: none;}
+
+.stocks-grid {display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px;}
 
 .stock-card {
     background: white;
-    border-radius: 8px;
-    padding: 16px;
-    border: 1px solid #f0f0f0;
+    border-radius: 12px;
+    padding: 18px;
+    border: 2px solid #f0f0f0;
     cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
 .stock-card:hover {
-    box-shadow: 0 8px 20px rgba(84, 110, 237, 0.15);
-    transform: translateY(-3px);
-    border-color: #546ded;
+    box-shadow: 0 12px 32px rgba(84, 110, 237, 0.15);
+    transform: translateY(-6px);
+    border-color: #667eea;
 }
 
-.stock-card-header {margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;}
-.stock-code {font-size: 18px; font-weight: bold; color: #546ded;}
-.stock-name {font-size: 14px; color: #333; margin-top: 3px; font-weight: 500;}
+.stock-card-header {margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;}
+.stock-code {font-size: 18px; font-weight: 700; color: #667eea;}
+.stock-name {font-size: 14px; color: #333; margin-top: 4px; font-weight: 500;}
 
-.stock-stats {display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 13px;}
-.stock-stat {background: #f9fbfc; padding: 10px; border-radius: 4px;}
-.stock-stat-label {color: #999; margin-bottom: 3px;}
-.stock-stat-value {font-size: 14px; font-weight: bold; color: #222;}
+.stock-stats {display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; font-size: 13px;}
+.stock-stat {background: #f9fbfc; padding: 12px; border-radius: 6px; border-left: 3px solid #667eea;}
+.stock-stat-label {color: #999; margin-bottom: 4px; font-size: 11px;}
+.stock-stat-value {font-size: 15px; font-weight: 700; color: #222;}
 
 .hidden {display: none;}
-
 .detail-page {display: none;}
 .detail-page.active {display: block;}
 
 .back-btn {
-    background: #546ded;
+    background: linear-gradient(135deg, #667eea, #764ba2);
     color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
+    padding: 12px 24px;
+    border-radius: 8px;
     cursor: pointer;
     margin-bottom: 20px;
     font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
-.back-btn:hover {background: #4a59c4;}
+
+.back-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
 
 .stock-header {
-    background: white;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-    margin-bottom: 20px;
+    background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    margin-bottom: 25px;
+    border-left: 5px solid #667eea;
 }
 
-.stock-title {font-size: 22px; font-weight: bold; margin-bottom: 15px;}
+.stock-title {font-size: 24px; font-weight: 700; margin-bottom: 18px; color: #222;}
 
-.stats-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
-    margin-bottom: 15px;
-}
+.stats-row {display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 18px; margin-bottom: 20px;}
 
-.stat-box {background: #f5f7fa; padding: 15px; border-radius: 6px; text-align: center;}
-.stat-box-value {font-size: 20px; font-weight: bold; color: #546ded;}
-.stat-box-label {font-size: 12px; color: #888; margin-top: 5px;}
+.stat-box {background: white; padding: 18px; border-radius: 12px; text-align: center; border: 2px solid #f0f0f0; transition: all 0.2s;}
+.stat-box:hover {border-color: #667eea; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);}
+.stat-box-value {font-size: 24px; font-weight: 700; color: #667eea;}
+.stat-box-label {font-size: 12px; color: #999; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px;}
 
-.history-table {background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.08);}
+.chart-container {background: white; border-radius: 12px; padding: 20px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 2px solid #f0f0f0;}
+.chart-container h3 {font-size: 16px; font-weight: 700; margin-bottom: 15px; color: #222;}
+
+.history-table {background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 2px solid #f0f0f0;}
 table {width: 100%; border-collapse: collapse;}
-th {background: #f5f7fa; padding: 12px; text-align: left; font-weight: 600; font-size: 12px; color: #333; border-bottom: 1px solid #eee;}
-td {padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 13px;}
-tr:hover {background: #fafbfc;}
+th {background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 14px; text-align: left; font-weight: 700; font-size: 12px; color: #333; border-bottom: 2px solid #e0e0e0; text-transform: uppercase; letter-spacing: 0.5px;}
+td {padding: 14px; border-bottom: 1px solid #f0f0f0; font-size: 13px;}
+tbody tr {transition: all 0.2s;}
+tbody tr:hover {background: linear-gradient(90deg, #667eea05 0%, #764ba205 100%); box-shadow: inset 0 0 10px rgba(102, 126, 234, 0.1);}
+
+.row-highlight {background: linear-gradient(90deg, rgba(39,174,96,0.1) 0%, rgba(39,174,96,0.05) 100%);}
+.row-highlight:hover {background: linear-gradient(90deg, rgba(39,174,96,0.2) 0%, rgba(39,174,96,0.15) 100%);}
+
+.row-delete {background: linear-gradient(90deg, rgba(231,76,60,0.1) 0%, rgba(231,76,60,0.05) 100%);}
+.row-delete:hover {background: linear-gradient(90deg, rgba(231,76,60,0.2) 0%, rgba(231,76,60,0.15) 100%);}
+
+.status-badge {display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;}
+.status-new {background: #d4edda; color: #155724;}
+.status-delete {background: #f8d7da; color: #721c24;}
+.status-add {background: #d1ecf1; color: #0c5460;}
+.status-reduce {background: #f8d7da; color: #721c24;}
 
 .no-data {color: #999; text-align: center; padding: 30px; font-size: 14px;}
     </style>
@@ -189,16 +247,16 @@ tr:hover {background: #fafbfc;}
 <body>
 
 <div class="gradient-header">
-    <h1>🏛️ ETF持股分析平台</h1>
+    <h1>🚀 ETF持股分析平台 Pro</h1>
     <p id="updateTime">最新更新: 2025/11/07</p>
-    <p>資料來源: 群益、野村、統一</p>
+    <p>實時異動監控 • 智能持股分析 • 完整歷史追蹤</p>
 </div>
 
 <div class="container">
     <div class="tabs-container">
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchMode('changes')">異動明細</button>
-            <button class="tab-btn" onclick="switchMode('search')">股票查詢</button>
+            <button class="tab-btn active" onclick="switchMode('changes')">📊 異動明細</button>
+            <button class="tab-btn" onclick="switchMode('search')">🔍 股票查詢</button>
         </div>
     </div>
 
@@ -216,7 +274,7 @@ tr:hover {background: #fafbfc;}
     <!-- 股票查詢模式 -->
     <div id="searchMode" class="content-box hidden">
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="搜尋股票代碼或名稱... 例如: 2330、台積電">
+            <input type="text" id="searchInput" placeholder="🔎 搜尋股票代碼或名稱... 例如: 2330、台積電">
         </div>
         <div class="stocks-grid" id="stocksList"></div>
     </div>
@@ -228,17 +286,21 @@ tr:hover {background: #fafbfc;}
             <div class="stock-title" id="detailTitle"></div>
             <div class="stats-row" id="statsContainer"></div>
         </div>
-        <div id="etfTabsDetail" style="margin-bottom: 20px;"></div>
+        <div id="etfTabsDetail" style="margin-bottom: 25px;"></div>
+        <div class="chart-container" id="chartContainer" style="display:none;">
+            <h3>📈 持股趨勢圖</h3>
+            <canvas id="trendChart" style="max-height: 300px;"></canvas>
+        </div>
         <div class="history-table">
             <table id="historyTable">
                 <thead>
                     <tr>
-                        <th>日期</th>
-                        <th>持股(張)</th>
-                        <th>權重(%)</th>
-                        <th>張數變動</th>
-                        <th>權重變動</th>
-                        <th>狀態</th>
+                        <th>📅 日期</th>
+                        <th>📊 持股(張)</th>
+                        <th>💯 權重(%)</th>
+                        <th>📈 張數變動</th>
+                        <th>📊 權重變動</th>
+                        <th>🏷️ 狀態</th>
                     </tr>
                 </thead>
                 <tbody id="historyBody"></tbody>
@@ -254,6 +316,7 @@ let currentETF = '00981A';
 let currentMode = 'changes';
 let currentStock = null;
 let detailETF = null;
+let trendChart = null;
 
 function switchMode(mode) {
     currentMode = mode;
@@ -294,7 +357,7 @@ function renderChanges() {
             <div class="etf-price-name">${data.name}</div>
             <div class="etf-price-value">$${data.price}</div>
             <div class="etf-price-change ${parseFloat(data.change_value) < 0 ? 'negative' : 'positive'}">
-                ${parseFloat(data.change_value) >= 0 ? '▲' : '▼'} ${data.change_value} (${data.change_percent})
+                ${parseFloat(data.change_value) >= 0 ? '📈 ▲' : '📉 ▼'} ${data.change_value} (${data.change_percent})
             </div>
         </div>
     `;
@@ -303,13 +366,14 @@ function renderChanges() {
     grid.innerHTML = '';
     
     if (!data.daily_changes || data.daily_changes.length === 0) {
-        grid.innerHTML = '<p style="color:#999;grid-column:1/-1;">今日無異動資料</p>';
+        grid.innerHTML = '<p class="no-data">今日無異動資料</p>';
         return;
     }
     
     data.daily_changes.forEach(change => {
         const badgeClass = change.type === '新增' ? 'new' : change.type === '增持' ? 'add' : change.type === '減持' ? 'reduce' : 'delete';
         const cardClass = change.type === '新增' ? 'new-add' : change.type === '刪除' ? 'delete' : '';
+        const badgeIcon = change.type === '新增' ? '✨' : change.type === '刪除' ? '🗑️' : change.type === '增持' ? '📈' : '📉';
         
         const countChangeStr = change.count_change >= 0 ? '+' : '';
         const weightChangeStr = change.weight_change >= 0 ? '+' : '';
@@ -324,26 +388,26 @@ function renderChanges() {
                     <div class="change-code">${change.code}</div>
                     <div class="change-name">${change.name}</div>
                 </div>
-                <span class="badge ${badgeClass}">${change.type}</span>
+                <span class="badge ${badgeClass}"><span class="badge-icon">${badgeIcon}</span>${change.type}</span>
             </div>
             
             <div class="change-stats">
                 <div class="stat-item">
-                    <div class="stat-label">今日持股</div>
+                    <div class="stat-label">💼 今日持股</div>
                     <div class="stat-value">${formatNumber(change.current_count)}</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-label">今日權重</div>
+                    <div class="stat-label">💯 今日權重</div>
                     <div class="stat-value">${change.current_weight.toFixed(2)}%</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-label">張數變動</div>
+                    <div class="stat-label">📊 張數變動</div>
                     <div class="stat-value ${change.count_change > 0 ? 'positive' : 'negative'}">
                         ${countChangeStr}${formatNumber(change.count_change)}
                     </div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-label">權重變動</div>
+                    <div class="stat-label">📈 權重變動</div>
                     <div class="stat-value ${change.weight_change > 0 ? 'positive' : 'negative'}">
                         ${weightChangeStr}${change.weight_change.toFixed(2)}%
                     </div>
@@ -401,14 +465,18 @@ function showStockDetail(stockCode, etfCode) {
     document.getElementById('searchMode').classList.add('hidden');
     document.getElementById('detailPage').classList.add('active');
     
-    document.getElementById('detailTitle').textContent = `${stock.code} ${stock.name || ''}`;
+    document.getElementById('detailTitle').textContent = `📍 ${stock.code} ${stock.name || ''}`;
     
     const etfCount = Object.keys(stock.etf_holdings).length;
     const totalCount = Object.values(stock.etf_holdings).reduce((sum, etf) => sum + (etf.current_count || 0), 0);
+    const maxCount = Math.max(...Object.values(stock.etf_holdings).map(e => e.max_count || 0));
+    const minCount = Math.min(...Object.values(stock.etf_holdings).map(e => e.min_count || Infinity).filter(v => v !== Infinity));
     
     document.getElementById('statsContainer').innerHTML = `
-        <div class="stat-box"><div class="stat-box-value">${etfCount}</div><div class="stat-box-label">持有ETF數量</div></div>
+        <div class="stat-box"><div class="stat-box-value">${etfCount}</div><div class="stat-box-label">持有ETF</div></div>
         <div class="stat-box"><div class="stat-box-value">${formatNumber(totalCount)}</div><div class="stat-box-label">當前總持股</div></div>
+        <div class="stat-box"><div class="stat-box-value">${formatNumber(maxCount)}</div><div class="stat-box-label">最高持股</div></div>
+        <div class="stat-box"><div class="stat-box-value">${formatNumber(minCount)}</div><div class="stat-box-label">最低持股</div></div>
     `;
     
     const tabsDetail = document.getElementById('etfTabsDetail');
@@ -445,21 +513,72 @@ function renderHistoryTable(etfCode) {
         return new Date(b.date.replace(/\//g, '-')) - new Date(a.date.replace(/\//g, '-'));
     });
     
+    // 繪製趨勢圖
+    drawTrendChart(sortedHistory);
+    
     sortedHistory.forEach(record => {
         const changeClass = record.count_change > 0 ? 'positive' : record.count_change < 0 ? 'negative' : '';
+        const rowClass = record.status === '出清' ? 'row-delete' : record.status === '首次出現' ? 'row-highlight' : '';
         const countStr = record.count_change >= 0 ? '+' : '';
         const weightStr = record.weight_change >= 0 ? '+' : '';
-        html += `<tr>
+        const statusBadge = `<span class="status-badge status-${record.status === '出清' ? 'delete' : record.status === '首次出現' ? 'new' : record.status === '增持' ? 'add' : 'reduce'}">${record.status}</span>`;
+        
+        html += `<tr class="${rowClass}">
             <td>${record.date}</td>
-            <td>${formatNumber(record.count)}</td>
+            <td><strong>${formatNumber(record.count)}</strong></td>
             <td>${record.weight.toFixed(2)}%</td>
-            <td class="${changeClass}">${countStr}${formatNumber(record.count_change)}</td>
-            <td class="${changeClass}">${weightStr}${record.weight_change.toFixed(2)}%</td>
-            <td>${record.status}</td>
+            <td class="${changeClass}"><strong>${countStr}${formatNumber(record.count_change)}</strong></td>
+            <td class="${changeClass}"><strong>${weightStr}${record.weight_change.toFixed(2)}%</strong></td>
+            <td>${statusBadge}</td>
         </tr>`;
     });
     
     document.getElementById('historyBody').innerHTML = html;
+}
+
+function drawTrendChart(history) {
+    const chartContainer = document.getElementById('chartContainer');
+    chartContainer.style.display = 'block';
+    
+    const sortedHistory = [...history].sort((a, b) => {
+        return new Date(a.date.replace(/\//g, '-')) - new Date(b.date.replace(/\//g, '-'));
+    });
+    
+    const labels = sortedHistory.map(h => h.date);
+    const counts = sortedHistory.map(h => h.count);
+    
+    const ctx = document.getElementById('trendChart').getContext('2d');
+    
+    if (trendChart) {
+        trendChart.destroy();
+    }
+    
+    trendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '持股張數',
+                data: counts,
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#667eea',
+                pointBorderColor: 'white',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {legend: {display: false}},
+            scales: {y: {beginAtZero: false, grid: {color: 'rgba(0,0,0,0.05)'}}},
+        }
+    });
 }
 
 function backToMode() {
