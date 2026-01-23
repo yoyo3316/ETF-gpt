@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🚀 ETF持股分析平台 Pro</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -180,7 +181,7 @@
             color: #27ae60;
         }
 
-        /* 卡片網格 - 緊湊版！ */
+        /* 卡片網格 */
         .changes-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -527,7 +528,7 @@
         }
 
         .modal-content {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 30px auto;
             background: white;
             border-radius: 20px;
@@ -552,8 +553,68 @@
             margin-top: 5px;
         }
 
+        .modal-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .modal-stat-card {
+            background: #f9fafb;
+            padding: 16px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e5e7eb;
+        }
+
+        .modal-stat-card .label {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 6px;
+        }
+
+        .modal-stat-card .value {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .modal-stat-card .value.success {
+            color: var(--success);
+        }
+
+        .modal-stat-card .value.danger {
+            color: var(--danger);
+        }
+
+        .modal-stat-card .value.primary {
+            color: var(--primary);
+        }
+
+        .modal-stat-card .sub {
+            font-size: 11px;
+            color: #bbb;
+            margin-top: 4px;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 2px solid var(--card-border);
+        }
+
+        .chart-container h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #222;
+        }
+
         .modal-table {
-            max-height: 500px;
+            max-height: 400px;
             overflow-y: auto;
             border: 2px solid #f0f0f0;
             border-radius: 12px;
@@ -688,6 +749,7 @@
         let currentETF = '00981A';
         let currentMode = 'changes';
         let weeklyETF = '00981A';
+        let currentChart = null;
 
         // 載入數據
         async function loadData() {
@@ -770,7 +832,7 @@
                                 change.count_change > 0 ? '📈' : '📉';
 
                 return `
-                    <div class="change-card ${typeClass}">
+                    <div class="change-card ${typeClass}" onclick="showStockDetail('${change.code}')">
                         <div class="change-card-header">
                             <div class="change-code-name">
                                 <div class="change-code">${change.code}</div>
@@ -1025,39 +1087,141 @@
             }, 300);
         });
 
+        // 繪製趨勢圖
+        function drawTrendChart(canvasId, history) {
+            const sortedHistory = [...history].sort((a, b) => 
+                a.date.localeCompare(b.date)
+            );
+
+            const labels = sortedHistory.map(h => h.date);
+            const counts = sortedHistory.map(h => h.count);
+
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            
+            if (currentChart) {
+                currentChart.destroy();
+            }
+
+            currentChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '持股張數',
+                        data: counts,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.08)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: counts.length > 50 ? 0 : 3,
+                        pointBackgroundColor: '#667eea',
+                        pointBorderColor: 'white',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
         // 顯示股票詳情
         function showStockDetail(stockCode) {
             const stock = stockData[stockCode];
             if (!stock) return;
 
             const etfData = Object.entries(stock.etf_holdings).map(([etf, data]) => {
+                const canvasId = `chart-${etf.replace(/[^a-zA-Z0-9]/g, '')}`;
+                
                 return `
-                    <h3 style="color: var(--primary); margin: 20px 0 10px;">${etf} ${data.etf_name}</h3>
-                    <div class="modal-table">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>日期</th>
-                                    <th>持股(張)</th>
-                                    <th>權重(%)</th>
-                                    <th>張數變動</th>
-                                    <th>狀態</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${data.history.slice().reverse().map(r => `
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: var(--primary); margin: 20px 0 15px; font-size: 18px;">
+                            ${etf} ${data.etf_name}
+                        </h3>
+                        
+                        <div class="modal-stats">
+                            <div class="modal-stat-card">
+                                <div class="label">目前持股</div>
+                                <div class="value primary">${data.current_count}</div>
+                                <div class="sub">張</div>
+                            </div>
+                            <div class="modal-stat-card">
+                                <div class="label">目前權重</div>
+                                <div class="value">${data.current_weight}%</div>
+                            </div>
+                            <div class="modal-stat-card">
+                                <div class="label">最高持股</div>
+                                <div class="value success">${data.max_count}</div>
+                                <div class="sub">${data.max_count_date}</div>
+                            </div>
+                            <div class="modal-stat-card">
+                                <div class="label">最低持股</div>
+                                <div class="value danger">${data.min_count}</div>
+                                <div class="sub">${data.min_count_date}</div>
+                            </div>
+                        </div>
+
+                        <div class="chart-container">
+                            <h3>📈 持股趨勢圖</h3>
+                            <canvas id="${canvasId}" style="width: 100%; height: auto; max-height: 300px;"></canvas>
+                        </div>
+
+                        <div class="modal-table">
+                            <table>
+                                <thead>
                                     <tr>
-                                        <td>${r.date}</td>
-                                        <td style="font-weight:700;">${r.count}</td>
-                                        <td>${r.weight}</td>
-                                        <td style="color: ${r.count_change >= 0 ? 'var(--success)' : 'var(--danger)'}; font-weight:700;">
-                                            ${r.count_change > 0 ? '+' : ''}${r.count_change}
-                                        </td>
-                                        <td>${r.status}</td>
+                                        <th>日期</th>
+                                        <th>持股(張)</th>
+                                        <th>權重(%)</th>
+                                        <th>張數變動</th>
+                                        <th>權重變動</th>
+                                        <th>狀態</th>
                                     </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    ${data.history.slice().reverse().map(r => `
+                                        <tr>
+                                            <td style="font-weight: 600;">${r.date}</td>
+                                            <td style="font-weight: 700;">${r.count}</td>
+                                            <td>${r.weight}</td>
+                                            <td style="color: ${r.count_change >= 0 ? 'var(--success)' : 'var(--danger)'}; font-weight: 700;">
+                                                ${r.count_change > 0 ? '+' : ''}${r.count_change}
+                                            </td>
+                                            <td style="color: ${r.weight_change >= 0 ? 'var(--success)' : 'var(--danger)'};">
+                                                ${r.weight_change > 0 ? '+' : ''}${r.weight_change}
+                                            </td>
+                                            <td>
+                                                <span style="padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;
+                                                    background: ${r.status === '首次出現' ? '#dcfce7' : r.status === '出清' ? '#fee2e2' : '#f3f4f6'};
+                                                    color: ${r.status === '首次出現' ? '#166534' : r.status === '出清' ? '#b91c1c' : '#374151'};">
+                                                    ${r.status}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -1066,10 +1230,10 @@
             modal.className = 'modal-overlay';
             modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
             modal.innerHTML = `
-                <div class="modal-content">
+                <div class="modal-content" onclick="event.stopPropagation()">
                     <div class="modal-header">
                         <h2>${stockCode} ${stock.name}</h2>
-                        <p>完整歷史記錄</p>
+                        <p>完整持股歷史記錄與趨勢分析</p>
                     </div>
                     ${etfData}
                     <div class="close-btn">
@@ -1078,6 +1242,12 @@
                 </div>
             `;
             document.body.appendChild(modal);
+
+            // 繪製圖表
+            Object.entries(stock.etf_holdings).forEach(([etf, data]) => {
+                const canvasId = `chart-${etf.replace(/[^a-zA-Z0-9]/g, '')}`;
+                setTimeout(() => drawTrendChart(canvasId, data.history), 100);
+            });
         }
 
         // 切換模式
