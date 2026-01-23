@@ -17,7 +17,7 @@
             --success: #27ae60;
             --danger: #e74c3c;
             --muted: #888;
-            --card-border: #f0f0f0;
+            --card-border: #e0e0e0;
             --bg-grad-a: #f5f7fa;
             --bg-grad-b: #c3cfe2;
         }
@@ -180,21 +180,22 @@
             color: #27ae60;
         }
 
-        /* 卡片網格 */
+        /* 卡片網格 - 關鍵改進！ */
         .changes-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 20px;
         }
 
         .change-card {
             background: white;
-            border-radius: 12px;
-            padding: 16px;
+            border-radius: 16px;
+            padding: 20px;
             cursor: pointer;
             transition: all 0.3s;
             border: 2px solid var(--card-border);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             position: relative;
             overflow: hidden;
         }
@@ -204,7 +205,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            height: 4px;
+            height: 5px;
             width: 100%;
             background: linear-gradient(90deg, #546ded, var(--primary-2));
             transition: height 0.3s;
@@ -212,12 +213,12 @@
 
         .change-card:hover {
             box-shadow: 0 12px 32px rgba(84, 110, 237, 0.2);
-            transform: translateY(-8px);
+            transform: translateY(-5px);
             border-color: var(--primary);
         }
 
         .change-card:hover::before {
-            height: 6px;
+            height: 8px;
         }
 
         /* 新增標的卡片 */
@@ -254,9 +255,9 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--card-border);
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid #f0f0f0;
         }
 
         .change-code-name {
@@ -264,15 +265,15 @@
         }
 
         .change-code {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 700;
             color: #222;
+            margin-bottom: 4px;
         }
 
         .change-name {
             font-size: 13px;
             color: #999;
-            margin-top: 2px;
             font-weight: 500;
         }
 
@@ -280,10 +281,11 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 8px 16px;
+            padding: 6px 14px;
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
+            white-space: nowrap;
         }
 
         .badge.new {
@@ -322,27 +324,26 @@
         .change-stats {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 14px;
-            margin-bottom: 14px;
+            gap: 12px;
         }
 
         .stat-item {
             background: #f9fbfc;
-            padding: 14px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 10px;
             border-left: 3px solid var(--primary);
         }
 
         .stat-label {
             font-size: 11px;
             color: #999;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .stat-value {
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 700;
             color: #222;
         }
@@ -362,10 +363,10 @@
 
         .search-box input {
             width: 100%;
-            padding: 14px 16px;
+            padding: 14px 18px;
             border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
+            border-radius: 10px;
+            font-size: 15px;
             transition: all 0.2s;
         }
 
@@ -377,56 +378,56 @@
 
         /* 日期選擇器 */
         .date-selector {
-            background: #f9fafb;
-            padding: 20px;
+            background: linear-gradient(135deg, #667eea08 0%, #764ba208 100%);
+            padding: 24px;
             border-radius: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             border: 2px solid #e5e7eb;
         }
 
         .date-selector h3 {
-            margin-bottom: 15px;
+            margin-bottom: 16px;
             color: var(--primary);
-            font-size: 16px;
+            font-size: 17px;
         }
 
         .date-controls {
             display: flex;
-            gap: 15px;
+            gap: 16px;
             flex-wrap: wrap;
             align-items: flex-end;
         }
 
         .date-input-group {
             flex: 1;
-            min-width: 180px;
+            min-width: 200px;
         }
 
         .date-input-group label {
             display: block;
             font-size: 13px;
             color: #666;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             font-weight: 600;
         }
 
         .date-input-group select {
             width: 100%;
-            padding: 10px 12px;
+            padding: 11px 14px;
             border: 2px solid #ddd;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 14px;
             background: white;
         }
 
         .btn {
-            padding: 10px 24px;
+            padding: 11px 28px;
             background: linear-gradient(135deg, var(--primary), var(--primary-2));
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             transition: all 0.3s;
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
@@ -439,35 +440,47 @@
 
         .btn-success {
             background: linear-gradient(135deg, var(--success), #16a34a);
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
         }
 
         /* 統計卡片 */
         .summary-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 18px;
+            margin-bottom: 30px;
         }
 
         .summary-card {
             background: white;
-            padding: 20px;
-            border-radius: 12px;
+            padding: 22px;
+            border-radius: 14px;
             text-align: center;
             border: 2px solid #f0f0f0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            transition: all 0.2s;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border-color: var(--primary);
         }
 
         .summary-card .label {
             font-size: 12px;
             color: #999;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
         }
 
         .summary-card .value {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 700;
             color: var(--primary);
         }
@@ -476,20 +489,26 @@
             color: var(--success);
         }
 
+        .summary-card .sub-label {
+            font-size: 11px;
+            color: #bbb;
+            margin-top: 6px;
+        }
+
         /* 空狀態 */
         .no-data {
             color: #999;
             text-align: center;
-            padding: 60px 30px;
+            padding: 80px 30px;
             font-size: 16px;
         }
 
         .no-data::before {
             content: '📊';
             display: block;
-            font-size: 48px;
-            margin-bottom: 15px;
-            opacity: 0.5;
+            font-size: 56px;
+            margin-bottom: 18px;
+            opacity: 0.4;
         }
 
         /* 響應式 */
@@ -504,57 +523,122 @@
 
             .date-controls {
                 flex-direction: column;
-                align-items: stretch;
             }
 
             .date-input-group {
                 min-width: 100%;
             }
+
+            .summary-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
-        /* 彈窗 */
+        /* 彈窗樣式 */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.75);
             z-index: 1000;
             overflow-y: auto;
             padding: 20px;
+            animation: fadeIn 0.2s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .modal-content {
-            max-width: 1000px;
-            margin: 30px auto;
+            max-width: 1100px;
+            margin: 40px auto;
             background: white;
             border-radius: 20px;
-            padding: 30px;
+            padding: 32px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .modal-header {
-            margin-bottom: 20px;
-            padding-bottom: 15px;
+            margin-bottom: 24px;
+            padding-bottom: 18px;
             border-bottom: 2px solid #eee;
         }
 
         .modal-header h2 {
             color: var(--primary);
-            font-size: 22px;
+            font-size: 24px;
+            margin-bottom: 6px;
         }
 
         .modal-header p {
             color: #999;
             font-size: 14px;
-            margin-top: 5px;
+        }
+
+        .modal-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .modal-stat-card {
+            background: #f9fafb;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #e5e7eb;
+        }
+
+        .modal-stat-card .label {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 6px;
+        }
+
+        .modal-stat-card .value {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .modal-stat-card .value.success {
+            color: var(--success);
+        }
+
+        .modal-stat-card .value.danger {
+            color: var(--danger);
+        }
+
+        .modal-stat-card .value.primary {
+            color: var(--primary);
+        }
+
+        .modal-stat-card .sub {
+            font-size: 11px;
+            color: #bbb;
+            margin-top: 4px;
         }
 
         .modal-table {
-            max-height: 500px;
+            max-height: 520px;
             overflow-y: auto;
-            border: 2px solid #f0f0f0;
+            border: 2px solid #e0e0e0;
             border-radius: 12px;
             margin-bottom: 20px;
         }
@@ -566,20 +650,20 @@
 
         .modal-table th {
             background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
-            padding: 12px;
+            padding: 14px;
             text-align: left;
             font-size: 12px;
             color: #333;
             font-weight: 700;
             position: sticky;
             top: 0;
-            border-bottom: 2px solid #e0e0e0;
+            border-bottom: 2px solid #d0d0d0;
         }
 
         .modal-table td {
-            padding: 12px;
+            padding: 14px;
             border-bottom: 1px solid #f0f0f0;
-            font-size: 13px;
+            font-size: 14px;
         }
 
         .modal-table tbody tr:hover {
@@ -602,7 +686,7 @@
         <!-- 頁面切換標籤 -->
         <div class="tabs-container">
             <div class="tabs">
-                <button class="tab-btn active" data-mode="changes">📊 今日異動</button>
+                <button class="tab-btn active" data-mode="changes">📊 異動明細</button>
                 <button class="tab-btn" data-mode="weekly">✨ 本周新增</button>
                 <button class="tab-btn" data-mode="history">📅 歷史查詢</button>
                 <button class="tab-btn" data-mode="search">🔍 股票查詢</button>
@@ -613,9 +697,9 @@
         <div id="changesMode" class="content-box">
             <!-- ETF 切換標籤 -->
             <div class="etf-tabs" id="etfTabs">
-                <button class="etf-tab active" data-etf="00981A">00981A</button>
-                <button class="etf-tab" data-etf="00980A">00980A</button>
-                <button class="etf-tab" data-etf="00982A">00982A</button>
+                <button class="etf-tab active" data-etf="00981A">00981A 統一台股增長</button>
+                <button class="etf-tab" data-etf="00980A">00980A 野村智慧優選</button>
+                <button class="etf-tab" data-etf="00982A">00982A 群益強棒</button>
             </div>
 
             <!-- ETF 價格資訊 -->
@@ -629,9 +713,9 @@
         <div id="weeklyMode" class="content-box hidden">
             <!-- ETF 切換標籤 -->
             <div class="etf-tabs" id="weeklyEtfTabs">
-                <button class="etf-tab active" data-etf="00981A">00981A</button>
-                <button class="etf-tab" data-etf="00980A">00980A</button>
-                <button class="etf-tab" data-etf="00982A">00982A</button>
+                <button class="etf-tab active" data-etf="00981A">00981A 統一台股增長</button>
+                <button class="etf-tab" data-etf="00980A">00980A 野村智慧優選</button>
+                <button class="etf-tab" data-etf="00982A">00982A 群益強棒</button>
             </div>
 
             <!-- 統計摘要 -->
@@ -644,12 +728,12 @@
         <!-- 歷史查詢區塊 -->
         <div id="historyMode" class="content-box hidden">
             <div class="date-selector">
-                <h3>📅 選擇查詢日期</h3>
+                <h3>📅 選擇查詢條件</h3>
                 <div class="date-controls">
                     <div class="date-input-group">
                         <label>查詢日期</label>
                         <select id="historyDate">
-                            <option value="">請選擇...</option>
+                            <option value="">請選擇日期...</option>
                         </select>
                     </div>
                     <div class="date-input-group">
@@ -674,7 +758,7 @@
         <!-- 股票查詢區塊 -->
         <div id="searchMode" class="content-box hidden">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="🔍 輸入股票代號或名稱...">
+                <input type="text" id="searchInput" placeholder="🔍 輸入股票代號或名稱進行搜尋...">
             </div>
             <div id="searchResults" class="changes-grid"></div>
         </div>
@@ -744,9 +828,9 @@
                 <div class="etf-price-box">
                     <div class="etf-price-code">${currentETF}</div>
                     <div class="etf-price-name">${data.name}</div>
-                    <div class="etf-price-value">${data.price}</div>
+                    <div class="etf-price-value">${data.price || '--'}</div>
                     <div class="etf-price-change ${priceClass}">
-                        ${data.change_value} (${data.change_percent})
+                        ${data.change_value || '--'} (${data.change_percent || '--'})
                     </div>
                 </div>
             `;
@@ -832,9 +916,9 @@
             // 統計摘要
             document.getElementById('weeklySummary').innerHTML = `
                 <div class="summary-card">
-                    <div class="label">${weeklyETF}</div>
+                    <div class="label">本周新增標的</div>
                     <div class="value success">${newPositions.length}</div>
-                    <div class="label">檔新增標的</div>
+                    <div class="sub-label">${weeklyETF}</div>
                 </div>
             `;
 
@@ -846,7 +930,7 @@
             }
 
             grid.innerHTML = newPositions.sort((a, b) => b.date.localeCompare(a.date)).map(pos => `
-                <div class="change-card new-add">
+                <div class="change-card new-add" onclick="showStockDetail('${pos.code}')">
                     <div class="change-card-header">
                         <div class="change-code-name">
                             <div class="change-code">${pos.code}</div>
@@ -866,9 +950,13 @@
                             <div class="stat-label">建倉張數</div>
                             <div class="stat-value positive">${pos.count}</div>
                         </div>
-                        <div class="stat-item" style="grid-column: 1 / -1;">
-                            <div class="stat-label">權重</div>
+                        <div class="stat-item">
+                            <div class="stat-label">建倉權重</div>
                             <div class="stat-value">${pos.weight}%</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">所屬ETF</div>
+                            <div class="stat-value" style="font-size: 14px;">${weeklyETF}</div>
                         </div>
                     </div>
                 </div>
@@ -881,7 +969,8 @@
             const selectedETF = document.getElementById('historyETF').value;
 
             if (!selectedDate) {
-                document.getElementById('historyGrid').innerHTML = '<p class="no-data">請選擇日期</p>';
+                document.getElementById('historyGrid').innerHTML = '<p class="no-data">請選擇日期查詢</p>';
+                document.getElementById('historySummary').innerHTML = '';
                 return;
             }
 
@@ -902,29 +991,39 @@
             }
 
             // 統計
+            const newCount = changes.filter(c => c.status === '首次出現').length;
+            const increaseCount = changes.filter(c => c.status === '增持').length;
+            const decreaseCount = changes.filter(c => c.status === '減持').length;
+            const deleteCount = changes.filter(c => c.status === '出清').length;
+
             document.getElementById('historySummary').innerHTML = `
                 <div class="summary-card">
-                    <div class="label">異動數量</div>
+                    <div class="label">總異動</div>
                     <div class="value">${changes.length}</div>
+                    <div class="sub-label">${selectedDate}</div>
                 </div>
                 <div class="summary-card">
-                    <div class="label">新增</div>
-                    <div class="value success">${changes.filter(c => c.status === '首次出現').length}</div>
+                    <div class="label">新增標的</div>
+                    <div class="value success">${newCount}</div>
                 </div>
                 <div class="summary-card">
                     <div class="label">增持</div>
-                    <div class="value">${changes.filter(c => c.status === '增持').length}</div>
+                    <div class="value" style="color: #3b82f6;">${increaseCount}</div>
                 </div>
                 <div class="summary-card">
                     <div class="label">減持</div>
-                    <div class="value">${changes.filter(c => c.status === '減持').length}</div>
+                    <div class="value" style="color: #f59e0b;">${decreaseCount}</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">出清</div>
+                    <div class="value danger">${deleteCount}</div>
                 </div>
             `;
 
             // 卡片
             const grid = document.getElementById('historyGrid');
             if (changes.length === 0) {
-                grid.innerHTML = '<p class="no-data">該日期無異動</p>';
+                grid.innerHTML = '<p class="no-data">該日期無異動記錄</p>';
                 return;
             }
 
@@ -936,7 +1035,7 @@
                                  change.count_change > 0 ? 'add' : 'reduce';
 
                 return `
-                    <div class="change-card ${typeClass}">
+                    <div class="change-card ${typeClass}" onclick="showStockDetail('${change.code}')">
                         <div class="change-card-header">
                             <div class="change-code-name">
                                 <div class="change-code">${change.code}</div>
@@ -999,6 +1098,7 @@
                 grid.innerHTML = results.map(stock => {
                     const etfCount = Object.keys(stock.holdings).length;
                     const totalCount = Object.values(stock.holdings).reduce((sum, h) => sum + h.current_count, 0);
+                    const totalWeight = Object.values(stock.holdings).reduce((sum, h) => sum + parseFloat(h.current_weight), 0);
 
                     return `
                         <div class="change-card" onclick="showStockDetail('${stock.code}')">
@@ -1014,8 +1114,16 @@
                                     <div class="stat-value">${etfCount}</div>
                                 </div>
                                 <div class="stat-item">
-                                    <div class="stat-label">總持股</div>
+                                    <div class="stat-label">總持股張數</div>
                                     <div class="stat-value">${totalCount}</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">總權重</div>
+                                    <div class="stat-value">${totalWeight.toFixed(2)}%</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">操作</div>
+                                    <div class="stat-value" style="font-size: 14px; color: var(--primary);">點擊查看</div>
                                 </div>
                             </div>
                         </div>
@@ -1031,32 +1139,69 @@
 
             const etfData = Object.entries(stock.etf_holdings).map(([etf, data]) => {
                 return `
-                    <h3 style="color: var(--primary); margin: 20px 0 10px;">${etf} ${data.etf_name}</h3>
-                    <div class="modal-table">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>日期</th>
-                                    <th>持股(張)</th>
-                                    <th>權重(%)</th>
-                                    <th>張數變動</th>
-                                    <th>狀態</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${data.history.slice().reverse().map(r => `
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: var(--primary); margin: 20px 0 15px; font-size: 18px;">
+                            ${etf} ${data.etf_name}
+                        </h3>
+                        
+                        <div class="modal-stats">
+                            <div class="modal-stat-card">
+                                <div class="label">目前持股</div>
+                                <div class="value primary">${data.current_count}</div>
+                                <div class="sub">張</div>
+                            </div>
+                            <div class="modal-stat-card">
+                                <div class="label">目前權重</div>
+                                <div class="value">${data.current_weight}%</div>
+                            </div>
+                            <div class="modal-stat-card">
+                                <div class="label">最高持股</div>
+                                <div class="value success">${data.max_count}</div>
+                                <div class="sub">${data.max_count_date}</div>
+                            </div>
+                            <div class="modal-stat-card">
+                                <div class="label">最低持股</div>
+                                <div class="value danger">${data.min_count}</div>
+                                <div class="sub">${data.min_count_date}</div>
+                            </div>
+                        </div>
+
+                        <div class="modal-table">
+                            <table>
+                                <thead>
                                     <tr>
-                                        <td>${r.date}</td>
-                                        <td style="font-weight:700;">${r.count}</td>
-                                        <td>${r.weight}</td>
-                                        <td style="color: ${r.count_change >= 0 ? 'var(--success)' : 'var(--danger)'}; font-weight:700;">
-                                            ${r.count_change > 0 ? '+' : ''}${r.count_change}
-                                        </td>
-                                        <td>${r.status}</td>
+                                        <th>日期</th>
+                                        <th>持股(張)</th>
+                                        <th>權重(%)</th>
+                                        <th>張數變動</th>
+                                        <th>權重變動</th>
+                                        <th>狀態</th>
                                     </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    ${data.history.slice().reverse().map(r => `
+                                        <tr>
+                                            <td style="font-weight: 600;">${r.date}</td>
+                                            <td style="font-weight: 700;">${r.count}</td>
+                                            <td>${r.weight}</td>
+                                            <td style="color: ${r.count_change >= 0 ? 'var(--success)' : 'var(--danger)'}; font-weight: 700;">
+                                                ${r.count_change > 0 ? '+' : ''}${r.count_change}
+                                            </td>
+                                            <td style="color: ${r.weight_change >= 0 ? 'var(--success)' : 'var(--danger)'};">
+                                                ${r.weight_change > 0 ? '+' : ''}${r.weight_change}
+                                            </td>
+                                            <td>
+                                                <span style="padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;
+                                                    background: ${r.status === '首次出現' ? '#dcfce7' : r.status === '出清' ? '#fee2e2' : '#f3f4f6'};
+                                                    color: ${r.status === '首次出現' ? '#166534' : r.status === '出清' ? '#b91c1c' : '#374151'};">
+                                                    ${r.status}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -1065,10 +1210,10 @@
             modal.className = 'modal-overlay';
             modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
             modal.innerHTML = `
-                <div class="modal-content">
+                <div class="modal-content" onclick="event.stopPropagation()">
                     <div class="modal-header">
                         <h2>${stockCode} ${stock.name}</h2>
-                        <p>完整歷史記錄</p>
+                        <p>完整持股歷史記錄</p>
                     </div>
                     ${etfData}
                     <div class="close-btn">
