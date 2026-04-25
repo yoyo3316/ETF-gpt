@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETF Pro</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --primary:#4F46E5;--primary-light:#6366F1;--secondary:#8B5CF6;--accent:#EC4899;
+  --success:#10B981;--danger:#EF4444;--warning:#F59E0B;--dark:#0F172A;
+  --text:#1E293B;--text-light:#64748B;--bg-light:#F8FAFC;--white:#FFFFFF;
+  --border:#E2E8F0;--shadow:rgba(15,23,42,0.08)
+}
+@keyframes gradientFlow{0%{background-position:0 50%}50%{background-position:100% 50%}100%{background-position:0 50%}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft JhengHei","PingFang TC",sans-serif;
+  background:linear-gradient(-45deg,#667eea 0%,#764ba2 100%);background-size:400% 400%;
+  animation:gradientFlow 15s ease infinite;color:var(--text);min-height:100vh;line-height:1.6;font-size:16px}
+
+/* Loading */
+.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(-45deg,#667eea 0%,#764ba2 100%);
+  background-size:400% 400%;animation:gradientFlow 15s ease infinite;z-index:9999;
+  display:flex;flex-direction:column;justify-content:center;align-items:center}
+.loading-spinner{width:50px;height:50px;border:3px solid rgba(255,255,255,0.2);
+  border-top:3px solid white;border-radius:50%;animation:spin 0.8s linear infinite}
+.loading-text{margin-top:20px;font-size:17px;color:white;font-weight:500}
+
+/* Hero */
+.hero-header{background:white;padding:40px 28px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.1)}
+.hero-title{font-size:32px;font-weight:800;color:#1E293B;margin-bottom:14px;letter-spacing:-0.8px;
+  display:flex;align-items:center;justify-content:center;gap:14px}
+.hero-icon{font-size:36px;animation:float 3s ease-in-out infinite}
+.hero-subtitle{font-size:15px;color:#64748B;margin-bottom:18px;font-weight:600;letter-spacing:0.5px}
+.hero-date{display:inline-block;background:linear-gradient(135deg,#4F46E5 0%,#7C3AED 100%);color:white;
+  padding:10px 24px;border-radius:20px;font-size:14px;font-weight:700;box-shadow:0 4px 16px rgba(79,70,229,0.3)}
+
+/* Container */
+.container{max-width:1400px;margin:0 auto;padding:0 20px 40px}
+
+/* Main tabs desktop */
+.main-tabs-container{background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);
+  margin:20px 20px 0;border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,0.1);overflow:hidden}
+.main-tabs{display:flex;padding:14px;gap:10px;overflow-x:auto;scrollbar-width:none}
+.main-tabs::-webkit-scrollbar{display:none}
+.main-tab{flex:1;min-width:130px;padding:16px 20px;background:transparent;border:none;cursor:pointer;
+  color:var(--text-light);font-size:15px;font-weight:700;border-radius:14px;
+  transition:all 0.3s cubic-bezier(0.4,0,0.2,1);white-space:nowrap;
+  display:flex;align-items:center;justify-content:center;gap:8px}
+.main-tab:hover{background:var(--bg-light);color:var(--primary);transform:translateY(-2px)}
+.main-tab.active{background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%);
+  color:white;box-shadow:0 6px 20px rgba(79,70,229,0.4)}
+.main-tab .tab-icon{font-size:20px}
+
+/* Mobile nav 2x3 */
+.mobile-nav-grid{display:none;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 10px}
+.mobile-nav-card{background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:18px;
+  padding:22px 12px;text-align:center;cursor:pointer;
+  transition:all 0.3s cubic-bezier(0.4,0,0.2,1);border:2px solid transparent;
+  box-shadow:0 4px 20px rgba(0,0,0,0.1)}
+.mobile-nav-card:hover{transform:translateY(-6px);box-shadow:0 12px 40px rgba(79,70,229,0.25);border-color:var(--primary-light)}
+.mobile-nav-card.active{background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%);
+  border-color:transparent;box-shadow:0 12px 40px rgba(79,70,229,0.4)}
+.mobile-nav-card.active .mobile-nav-icon{transform:scale(1.1)}
+.mobile-nav-card.active .mobile-nav-label{color:white}
+.mobile-nav-icon{font-size:40px;margin-bottom:10px;transition:transform 0.3s;display:block}
+.mobile-nav-label{font-size:14px;font-weight:700;color:var(--text);transition:color 0.3s}
+
+/* Content sections */
+.content-section{background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);
+  border-radius:20px;padding:32px;box-shadow:0 4px 20px rgba(0,0,0,0.1);margin:20px}
+.content-section.hidden{display:none}
+
+/* ETF Tabs */
+.etf-tabs{display:flex;gap:12px;margin-bottom:24px;padding-bottom:20px;border-bottom:2px solid var(--border);flex-wrap:wrap;justify-content:center}
+.etf-tab{background:var(--bg-light);border:2px solid var(--border);cursor:pointer;color:var(--text-light);
+  font-size:15px;padding:14px 26px;border-radius:12px;transition:all 0.3s;font-weight:600}
+.etf-tab:hover{background:white;border-color:var(--primary-light);color:var(--primary);transform:translateY(-2px)}
+.etf-tab.active{background:var(--primary);border-color:var(--primary);color:white;box-shadow:0 6px 20px rgba(79,70,229,0.3)}
+
+/* Week nav */
+.week-nav{display:flex;gap:12px;margin-bottom:24px;padding:20px;background:var(--bg-light);
+  border-radius:16px;flex-wrap:wrap;align-items:center;justify-content:center}
+.week-range{font-size:19px;font-weight:800;color:var(--primary);flex:1;min-width:200px;text-align:center}
+.week-btn{background:white;border:2px solid var(--primary);color:var(--primary);
+  padding:13px 26px;border-radius:12px;cursor:pointer;font-weight:700;font-size:15px;
+  transition:all 0.3s;white-space:nowrap}
+.week-btn:hover:not(:disabled){background:var(--primary);color:white;transform:translateY(-2px);box-shadow:0 6px 20px rgba(79,70,229,0.3)}
+.week-btn:disabled{opacity:0.3;cursor:not-allowed}
+.week-btn.latest{background:var(--success);border-color:var(--success);color:white}
+.week-btn.latest:hover:not(:disabled){background:#059669;box-shadow:0 6px 20px rgba(16,185,129,0.4)}
+
+/* Calendar */
+.calendar-table{width:100%;border-collapse:separate;border-spacing:0;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px var(--shadow)}
+.calendar-table th{background:var(--primary);color:white;padding:18px 12px;font-size:16px;font-weight:700;text-align:center}
+.calendar-table td{padding:18px 14px;border:1px solid var(--border);vertical-align:top;min-width:170px;background:white;transition:background 0.3s}
+.calendar-table td:hover{background:var(--bg-light)}
+.calendar-table td.today-marker{background:linear-gradient(135deg,#FEF3C7 0%,#FDE68A 100%);border:2px solid var(--warning);position:relative}
+.calendar-table td.today-marker::before{content:"今日";position:absolute;top:6px;right:6px;background:var(--warning);color:white;font-size:11px;padding:5px 12px;border-radius:8px;font-weight:700}
+
+/* Mobile calendar */
+.mobile-calendar{display:none}
+.mobile-day-card{background:white;border-radius:16px;padding:22px;margin-bottom:16px;border:2px solid var(--border);box-shadow:0 4px 12px var(--shadow)}
+.mobile-day-card.today-marker{background:linear-gradient(135deg,#FEF3C7 0%,#FDE68A 100%);border-color:var(--warning)}
+.mobile-day-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid var(--border)}
+.mobile-day-title{font-size:22px;font-weight:900;color:var(--text)}
+.mobile-day-date{font-size:15px;color:var(--text-light);font-weight:600}
+.mobile-today-badge{background:var(--warning);color:white;padding:7px 16px;border-radius:12px;font-size:13px;font-weight:800}
+
+/* Change sections */
+.change-section{margin-bottom:14px}
+.change-section-title{font-size:15px;font-weight:800;margin-bottom:12px;padding:10px 14px;border-radius:10px;display:flex;align-items:center;gap:8px}
+.change-section-title.new{color:var(--success);background:rgba(16,185,129,0.1);border-left:4px solid var(--success)}
+.change-section-title.delete{color:var(--danger);background:rgba(239,68,68,0.1);border-left:4px solid var(--danger)}
+.stock-mini-list{display:flex;flex-direction:column;gap:8px}
+.stock-mini-item{background:var(--bg-light);padding:12px 16px;border-radius:10px;cursor:pointer;
+  transition:all 0.3s;border-left:3px solid transparent;display:flex;align-items:center}
+.stock-mini-item:hover{background:white;transform:translateX(4px);box-shadow:0 4px 12px var(--shadow)}
+.stock-mini-item.new{border-left-color:var(--success)}
+.stock-mini-item.delete{border-left-color:var(--danger)}
+.stock-code{font-weight:800;color:var(--text);font-size:16px}
+.stock-name{color:var(--text-light);font-size:15px;margin-left:10px;font-weight:600;flex:1}
+.stock-count{color:var(--success);font-weight:800;font-size:15px}
+
+/* Changes grid */
+.changes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-top:20px}
+.change-card{background:white;border-radius:16px;padding:22px;cursor:pointer;transition:all 0.3s;
+  border:2px solid var(--border);position:relative;overflow:hidden}
+.change-card::before{content:"";position:absolute;top:0;left:0;height:4px;width:100%;
+  background:linear-gradient(90deg,var(--primary),var(--secondary))}
+.change-card:hover{transform:translateY(-6px);box-shadow:0 12px 32px var(--shadow);border-color:var(--primary-light)}
+.change-card.new-add{border-color:var(--success);background:linear-gradient(135deg,rgba(16,185,129,0.05) 0%,white 50%)}
+.change-card.new-add::before{background:var(--success)}
+.change-card.delete{border-color:var(--danger);background:linear-gradient(135deg,rgba(239,68,68,0.05) 0%,white 50%)}
+.change-card.delete::before{background:var(--danger)}
+.change-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;padding-bottom:14px;border-bottom:2px solid var(--bg-light)}
+.change-code{font-size:24px;font-weight:800;color:var(--text)}
+.change-name{font-size:16px;color:var(--text-light);margin-top:5px;font-weight:600}
+.badge{padding:7px 16px;border-radius:10px;font-size:12px;font-weight:800;text-transform:uppercase}
+.badge.new{background:var(--success);color:white}
+.badge.delete{background:var(--danger);color:white}
+.change-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.stat-item{background:var(--bg-light);padding:14px;border-radius:10px}
+.stat-label{font-size:11px;color:var(--text-light);margin-bottom:8px;text-transform:uppercase;font-weight:700}
+.stat-value{font-size:22px;font-weight:800;color:var(--text)}
+.stat-value.positive{color:var(--success)}
+.stat-value.negative{color:var(--danger)}
+
+/* Search */
+.search-box{margin-bottom:24px}
+.search-box input{width:100%;padding:18px 22px;border:2px solid var(--border);border-radius:16px;
+  font-size:17px;transition:all 0.3s;background:white;font-weight:500}
+.search-box input:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(79,70,229,0.1);outline:none}
+
+/* Date selector */
+.date-selector{background:var(--bg-light);padding:26px;border-radius:16px;margin-bottom:24px}
+.date-selector h3{margin-bottom:18px;color:var(--primary);font-size:20px;font-weight:800}
+.history-nav-bar{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:18px;
+  padding-top:16px;border-top:2px solid var(--border);flex-wrap:wrap}
+.history-nav-btn{background:white;border:2px solid var(--primary);color:var(--primary);
+  padding:10px 24px;border-radius:10px;cursor:pointer;font-weight:700;font-size:15px;transition:all 0.25s;white-space:nowrap}
+.history-nav-btn:hover:not(:disabled){background:var(--primary);color:white;transform:translateY(-2px);box-shadow:0 6px 18px rgba(79,70,229,0.3)}
+.history-nav-btn:disabled{opacity:0.3;cursor:not-allowed}
+.history-nav-label{font-size:15px;font-weight:800;color:var(--primary);flex:1;text-align:center;min-width:180px}
+.date-controls{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end}
+.date-input-group{flex:1;min-width:200px}
+.date-input-group label{display:block;font-size:14px;color:var(--text);margin-bottom:10px;font-weight:700}
+.date-input-group select,.date-input-group input[type=date]{width:100%;padding:14px 18px;
+  border:2px solid var(--border);border-radius:12px;font-size:16px;background:white;transition:all 0.3s;font-weight:600}
+.date-input-group input:focus,.date-input-group select:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(79,70,229,0.1);outline:none}
+.btn{padding:14px 36px;background:var(--primary);color:white;border:none;border-radius:12px;
+  cursor:pointer;font-size:16px;font-weight:700;transition:all 0.3s;box-shadow:0 6px 20px rgba(79,70,229,0.3)}
+.btn:hover{background:var(--primary-light);transform:translateY(-2px);box-shadow:0 8px 24px rgba(79,70,229,0.4)}
+
+/* Summary */
+.summary-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:18px;margin-bottom:24px}
+.summary-card{background:white;padding:22px;border-radius:16px;text-align:center;border:2px solid var(--border);transition:all 0.3s}
+.summary-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px var(--shadow);border-color:var(--primary-light)}
+.summary-card .label{font-size:12px;color:var(--text-light);margin-bottom:12px;text-transform:uppercase;font-weight:800}
+.summary-card .value{font-size:34px;font-weight:900;color:var(--primary)}
+.summary-card .value.success{color:var(--success)}
+.summary-card .value.danger{color:var(--danger)}
+
+/* Modal */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.8);
+  backdrop-filter:blur(8px);z-index:1000;overflow-y:auto;padding:20px;animation:fadeIn 0.3s}
+.modal-content{max-width:1100px;margin:40px auto;background:white;border-radius:24px;padding:36px;
+  box-shadow:0 24px 72px rgba(0,0,0,0.3);animation:slideUp 0.4s}
+.modal-header{margin-bottom:24px;padding-bottom:18px;border-bottom:2px solid var(--border);position:relative}
+.modal-header h2{color:var(--text);font-size:28px;font-weight:800;padding-right:40px}
+.modal-header p{color:var(--text-light);font-size:15px;margin-top:8px}
+.modal-close-btn{position:absolute;top:0;right:0;background:var(--bg-light);border:none;font-size:26px;
+  color:var(--text-light);cursor:pointer;width:42px;height:42px;display:flex;align-items:center;
+  justify-content:center;border-radius:10px;transition:all 0.3s}
+.modal-close-btn:hover{background:var(--danger);color:white;transform:rotate(90deg)}
+.modal-etf-tabs{display:flex;gap:12px;margin-bottom:22px;padding-bottom:18px;border-bottom:2px solid var(--border);flex-wrap:wrap}
+.modal-etf-tab{background:var(--bg-light);border:2px solid var(--border);cursor:pointer;color:var(--text-light);
+  font-size:15px;padding:12px 22px;border-radius:12px;transition:all 0.3s;font-weight:700}
+.modal-etf-tab:hover{background:white;border-color:var(--primary-light);color:var(--primary)}
+.modal-etf-tab.active{background:var(--primary);border-color:var(--primary);color:white}
+.modal-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-bottom:22px}
+.modal-stat-card{background:var(--bg-light);padding:18px;border-radius:12px;text-align:center;border:2px solid var(--border)}
+.modal-stat-card .label{font-size:12px;color:var(--text-light);margin-bottom:10px;font-weight:700;text-transform:uppercase}
+.modal-stat-card .value{font-size:26px;font-weight:900}
+.modal-stat-card .value.success{color:var(--success)}
+.modal-stat-card .value.danger{color:var(--danger)}
+.modal-stat-card .value.primary{color:var(--primary)}
+.modal-stat-card .sub{font-size:13px;color:var(--text-light);margin-top:8px;font-weight:600}
+
+/* Chart container + zoom */
+.chart-container{background:var(--bg-light);border-radius:16px;padding:24px;margin-bottom:26px;position:relative}
+.chart-container h3{font-size:20px;font-weight:800;margin-bottom:18px;color:var(--text)}
+.chart-hint{font-size:12px;color:var(--text-light);margin-bottom:10px;font-weight:500}
+.reset-zoom-btn{position:absolute;top:20px;right:20px;padding:6px 16px;background:var(--primary);
+  color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;
+  transition:all 0.2s;opacity:0.8; z-index: 10;}
+.reset-zoom-btn:hover{opacity:1;transform:translateY(-1px)}
+
+/* 讓捲動軸外觀更佳 */
+.canvas-scroll-wrapper {scrollbar-width: thin; scrollbar-color: var(--primary-light) var(--bg-light);}
+.canvas-scroll-wrapper::-webkit-scrollbar {height: 8px;}
+.canvas-scroll-wrapper::-webkit-scrollbar-track {background: var(--bg-light); border-radius: 4px;}
+.canvas-scroll-wrapper::-webkit-scrollbar-thumb {background-color: var(--primary-light); border-radius: 4px;}
+
+/* Modal table */
+.modal-table{max-height:400px;overflow-y:auto;border:2px solid var(--border);border-radius:16px;margin-bottom:24px;margin-top:4px}
+.modal-table::-webkit-scrollbar{width:8px}
+.modal-table::-webkit-scrollbar-track{background:var(--bg-light)}
+.modal-table::-webkit-scrollbar-thumb{background:var(--text-light);border-radius:4px}
+.modal-table table{width:100%;border-collapse:collapse}
+.modal-table th{background:#FFFFFF;padding:16px;text-align:left;font-size:13px;color:#1E293B;font-weight:800;
+  position:sticky;top:0;text-transform:uppercase;z-index:10;box-shadow:0 2px 8px rgba(15,23,42,0.1);border-bottom:2px solid #E2E8F0}
+.modal-table td{padding:16px;border-bottom:1px solid var(--border);font-size:15px}
+.modal-table tbody tr:hover{background:var(--bg-light)}
+.close-btn{text-align:center}
+.etf-content{display:none}
+.etf-content.active{display:block}
+.no-data{color:var(--text-light);text-align:center;padding:40px 20px;font-size:16px}
+
+/* ===== ETF排行榜 ===== */
+.ranking-updated{font-size:13px;color:var(--text-light);text-align:right;margin-bottom:16px}
+.ranking-scroll{overflow-x:auto;border-radius:16px;box-shadow:0 4px 20px var(--shadow)}
+.ranking-table{width:100%;border-collapse:collapse;min-width:700px}
+.ranking-table th{background:var(--primary);color:white;padding:14px 12px;font-size:13px;font-weight:700;text-align:center;white-space:nowrap}
+/* 排序功能的 header 設定 */
+.ranking-table th.sortable {cursor: pointer; transition: background 0.3s; user-select: none;}
+.ranking-table th.sortable:hover {background: var(--secondary);}
+.sort-icon {font-size: 10px; margin-left: 4px; display: inline-block;}
+
+.ranking-table td{padding:13px 12px;border-bottom:1px solid var(--border);font-size:14px;text-align:center;background:white;transition:background 0.2s;white-space:nowrap}
+.ranking-table tbody tr:hover td{background:var(--bg-light)}
+.ranking-table tbody tr.tracked-etf td{background:rgba(79,70,229,0.04)}
+.ranking-table tbody tr.tracked-etf:hover td{background:rgba(79,70,229,0.1)}
+.rank-badge{display:inline-block;width:28px;height:28px;line-height:28px;border-radius:50%;font-size:13px;font-weight:800;text-align:center}
+.rank-1{background:#FFD700;color:#7B5800}
+.rank-2{background:#C0C0C0;color:#444}
+.rank-3{background:#CD7F32;color:#fff}
+.rank-other{background:var(--bg-light);color:var(--text-light)}
+.return-positive{color:var(--success);font-weight:800}
+.return-negative{color:var(--danger);font-weight:800}
+.return-null{color:var(--text-light);font-size:12px}
+.tracked-tag{display:inline-block;background:var(--primary);color:white;font-size:10px;font-weight:700;
+  padding:2px 7px;border-radius:6px;margin-left:6px;vertical-align:middle}
+
+/* RWD */
+@media(max-width:768px){
+  body{font-size:15px}
+  .hero-header{padding:24px 16px}
+  .hero-title{font-size:22px;gap:8px}
+  .hero-icon{font-size:26px}
+  .hero-subtitle{font-size:13px;margin-bottom:14px}
+  .hero-date{font-size:12px;padding:7px 16px}
+  .container{padding:0 10px 30px}
+  .main-tabs-container{display:none}
+  .mobile-nav-grid{display:grid}
+  .mobile-nav-card{padding:16px 8px;border-radius:14px}
+  .mobile-nav-icon{font-size:30px;margin-bottom:6px}
+  .mobile-nav-label{font-size:12px}
+  .content-section{padding:18px;margin:12px 10px;border-radius:16px}
+  .etf-tabs{gap:6px;padding-bottom:16px;margin-bottom:18px}
+  .etf-tab{flex:1;min-width:110px;padding:10px 14px;font-size:13px;border-radius:10px}
+  .modal-etf-tabs{gap:8px;margin-bottom:18px;padding-bottom:14px}
+  .modal-etf-tab{padding:10px 16px;font-size:13px;border-radius:10px;flex:1;min-width:140px}
+  .modal-stats{grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px}
+  .modal-stat-card{padding:14px;border-radius:10px}
+  .modal-stat-card .label{font-size:11px;margin-bottom:8px}
+  .modal-stat-card .value{font-size:22px}
+  .modal-stat-card .sub{font-size:11px;margin-top:6px}
+  .modal-table{max-height:350px;font-size:13px;overflow-x:hidden}
+  .modal-table table{width:100%;table-layout:fixed}
+  .modal-table th,.modal-table td{padding:10px 4px;font-size:11px;word-wrap:break-word}
+  .modal-table th:nth-child(1),.modal-table td:nth-child(1){width:26%}
+  .modal-table th:nth-child(2),.modal-table td:nth-child(2){width:14%}
+  .modal-table th:nth-child(3),.modal-table td:nth-child(3){width:13%}
+  .modal-table th:nth-child(4),.modal-table td:nth-child(4){width:14%}
+  .modal-table th:nth-child(5),.modal-table td:nth-child(5){width:14%}
+  .modal-table th:nth-child(6),.modal-table td:nth-child(6){width:19%}
+  .modal-table td:nth-child(6) span{padding:4px;font-size:9px;line-height:1.3;display:inline-block;white-space:normal;word-break:keep-all}
+  .week-nav{flex-direction:column;gap:10px;padding:16px}
+  .week-range{order:-1;font-size:16px}
+  .week-btn{width:100%;padding:13px 20px;font-size:14px}
+  .calendar-table{display:none}
+  .mobile-calendar{display:block}
+  .changes-grid{grid-template-columns:1fr;gap:14px}
+  .date-controls{flex-direction:column}
+  .date-input-group{min-width:100%}
+  .btn{width:100%}
+  .summary-stats{grid-template-columns:repeat(2,1fr);gap:12px}
+  .summary-card{padding:16px}
+  .modal-content{margin:0;border-radius:0;min-height:100vh;padding:20px 16px}
+  .modal-header h2{font-size:22px;padding-right:36px}
+  .modal-header p{font-size:13px}
+  .modal-close-btn{width:36px;height:36px;font-size:22px}
+  .chart-container{padding:18px;margin-bottom:18px}
+  .chart-container h3{font-size:17px;margin-bottom:14px}
+  .reset-zoom-btn{top:14px;right:14px;padding:5px 12px;font-size:12px}
+  .stock-code{font-size:14px}
+  .stock-name{font-size:13px;margin-left:8px}
+  .stock-count{font-size:13px}
+  .change-card{padding:18px}
+  .change-code{font-size:20px}
+  .change-name{font-size:14px}
+  .ranking-table th,.ranking-table td{padding:10px 8px;font-size:12px}
+}
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">資料載入中...</div>
+</div>
+
+<div class="hero-header">
+  <div class="hero-title">
+    <span class="hero-icon">📊</span>
+    <span>ETF Pro</span>
+  </div>
+  <div class="hero-subtitle">即時追蹤 · 智能分析 · 完整歷史</div>
+  <div class="hero-date" id="updateTime">最新更新: --/--/--</div>
+</div>
+
+<div class="container">
+  <div class="main-tabs-container">
+    <div class="main-tabs">
+      <button class="main-tab active" data-mode="dashboard"><span class="tab-icon">📅</span><span>每週日曆</span></button>
+      <button class="main-tab" data-mode="changes"><span class="tab-icon">🔔</span><span>最新異動</span></button>
+      <button class="main-tab" data-mode="history"><span class="tab-icon">🔍</span><span>歷史查詢</span></button>
+      <button class="main-tab" data-mode="search"><span class="tab-icon">🏷️</span><span>股票搜尋</span></button>
+      <button class="main-tab" data-mode="ranking"><span class="tab-icon">🏆</span><span>ETF排行</span></button>
+    </div>
+  </div>
+
+  <div class="mobile-nav-grid">
+    <div class="mobile-nav-card active" data-mode="dashboard">
+      <div class="mobile-nav-icon">📅</div><div class="mobile-nav-label">每週日曆</div>
+    </div>
+    <div class="mobile-nav-card" data-mode="changes">
+      <div class="mobile-nav-icon">🔔</div><div class="mobile-nav-label">最新異動</div>
+    </div>
+    <div class="mobile-nav-card" data-mode="history">
+      <div class="mobile-nav-icon">🔍</div><div class="mobile-nav-label">歷史查詢</div>
+    </div>
+    <div class="mobile-nav-card" data-mode="search">
+      <div class="mobile-nav-icon">🏷️</div><div class="mobile-nav-label">股票搜尋</div>
+    </div>
+    <div class="mobile-nav-card" data-mode="ranking">
+      <div class="mobile-nav-icon">🏆</div><div class="mobile-nav-label">ETF排行</div>
+    </div>
+  </div>
+
+  <div id="dashboardMode" class="content-section">
+    <div class="etf-tabs" id="dashboardEtfTabs"></div>
+    <div class="week-nav">
+      <div class="week-range" id="weekRange">載入中...</div>
+      <button class="week-btn" id="prevWeekBtn" onclick="changeWeek(-1)">← 上一週</button>
+      <button class="week-btn latest" id="latestBtn" onclick="goToLatest()">🔥 回到最新</button>
+      <button class="week-btn" id="nextWeekBtn" onclick="changeWeek(1)">下一週 →</button>
+    </div>
+    <div id="calendarContainer"></div>
+    <div class="mobile-calendar" id="mobileCalendar"></div>
+  </div>
+
+  <div id="changesMode" class="content-section hidden">
+    <h3 style="font-size:22px;font-weight:800;margin-bottom:22px;color:var(--text)">
+      最新交易日&nbsp;<span id="changesDateTitle"></span>&nbsp;異動記錄
+    </h3>
+    <div class="etf-tabs" id="etfTabs"></div>
+    <div id="changesGrid" class="changes-grid"></div>
+  </div>
+
+  <div id="historyMode" class="content-section hidden">
+    <div class="date-selector">
+      <h3>📅 選擇查詢日期</h3>
+      <div class="date-controls">
+        <div class="date-input-group">
+          <label>查詢日期</label>
+          <input type="date" id="historyDate" min="2024-01-01" max="2027-12-31">
+        </div>
+        <div class="date-input-group">
+          <label>ETF基金</label>
+          <select id="historyETF"></select>
+        </div>
+        <button class="btn" onclick="loadHistoryData()">🔍 查詢</button>
+      </div>
+      <div class="history-nav-bar" id="historyNavBar" style="display:none">
+        <button class="history-nav-btn" id="historyPrevBtn" onclick="shiftHistoryDate(-1)">← 前一天</button>
+        <span class="history-nav-label" id="historyNavLabel"></span>
+        <button class="history-nav-btn" id="historyNextBtn" onclick="shiftHistoryDate(1)">後一天 →</button>
+      </div>
+    </div>
+    <div class="summary-stats" id="historySummary"></div>
+    <div id="historyGrid" class="changes-grid"></div>
+  </div>
+
+  <div id="searchMode" class="content-section hidden">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="輸入股票代碼或名稱搜尋…">
+    </div>
+    <div id="searchResults" class="changes-grid"></div>
+  </div>
+
+  <div id="rankingMode" class="content-section hidden">
+    <h3 style="font-size:22px;font-weight:800;margin-bottom:8px;color:var(--text)">🏆 主動式ETF 報酬率排行榜</h3>
+    <div id="rankingTableContainer" class="ranking-scroll">
+      <div class="no-data">載入中...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+let stockData, processedData, rankingData;
+let allDates = [];
+let currentETF = null, currentMode = 'dashboard';
+let dashboardETF = null, currentWeekOffset = 0;
+let chartInstances = new Map();
+let latestDataDate = null;
+
+// ETF 排行榜排序狀態
+let rankSortCol = 'return_3m';
+let rankSortAsc = false;
+
+// ===== ETF 短名稱對照表 =====
+const ETF_SHORT_NAMES = {
+  '00980A':'野村智慧優選','00981A':'統一台股增長','00982A':'群益精選強棒','00992A':'群益科技創新',
+  '00983A':'中信ARK創新','00984A':'安聯台灣高息','00985A':'野村台灣50','00986A':'台新龍頭成長',
+  '00987A':'台新優勢成長','00988A':'統一全球創新','00989A':'摩根美國科技','00990A':'元大AI新經濟',
+  '00991A':'復華未來50',  '00993A':'安聯台灣',    '00994A':'第一金台股優','00995A':'中信台灣卓越',
+  '00996A':'兆豐台灣豐收','00997A':'群益美國增長','00998A':'復華金融股息','00999A':'野村台灣高息',
+  '00400A':'國泰動能高息','00401A':'摩根台灣鑫收','00403A':'統一升級50',
+};
+function getShortName(code, fallback){
+  if(ETF_SHORT_NAMES[code]) return ETF_SHORT_NAMES[code];
+  if(!fallback) return code;
+  return fallback
+    .replace(/^主動/,'')
+    .replace(/主動式ETF基金$/,'').replace(/主動式ETF$/,'').replace(/主動ETF$/,'')
+    .replace(/主動式台灣/,'台灣').trim();
+}
+
+// ===== 資料載入 =====
+document.addEventListener('DOMContentLoaded', () => {
+  Promise.all([
+    fetch('./processed_etf_data.json').then(r=>{ if(!r.ok) throw new Error('processed_etf_data.json HTTP '+r.status); return r.json(); }),
+    fetch('./stock_history_data.json').then(r=>{ if(!r.ok) throw new Error('stock_history_data.json HTTP '+r.status); return r.json(); }),
+    fetch('./active_etf_ranking.json').then(r=>{ if(!r.ok) return null; return r.json(); }).catch(()=>null),
+  ])
+  .then(([processed, stock, ranking]) => {
+    processedData = processed;
+    stockData     = stock;
+    rankingData   = ranking;
+
+    const dateSet = new Set();
+    for(const stockItem of Object.values(stockData)){
+      if(stockItem.etf_holdings){
+        for(const etfHolding of Object.values(stockItem.etf_holdings)){
+          if(etfHolding.history){
+            for(const record of etfHolding.history) dateSet.add(record.date);
+          }
+        }
+      }
+    }
+    allDates = Array.from(dateSet).sort().reverse();
+
+    if(allDates.length > 0){
+      // 修正：安全解析 YYYYMMDD 為 Date 物件以修復日曆空白問題
+      const match = allDates[0].match(/(\d{4})(\d{2})(\d{2})/);
+      if(match){
+          latestDataDate = new Date(match[1], parseInt(match[2])-1, match[3]);
+      } else {
+          latestDataDate = new Date(allDates[0]);
+      }
+      const first = processedData[Object.keys(processedData)[0]];
+      if(first && first.latest_date) document.getElementById('updateTime').textContent = '最新更新: '+first.latest_date;
+    }
+    currentWeekOffset = 0;
+    buildETFTabs();
+    renderCalendar();
+    renderChanges();
+
+    document.getElementById('searchInput').addEventListener('input', e => {
+      const keyword = e.target.value.toLowerCase();
+      const results = [];
+      for(const [code, info] of Object.entries(stockData)){
+        if(code.toLowerCase().includes(keyword) || (info.name && info.name.toLowerCase().includes(keyword)))
+          results.push({code, name:info.name, holdings:info.etf_holdings});
+      }
+      renderSearchResults(results);
+    });
+
+    document.getElementById('loadingOverlay').remove();
+  })
+  .catch(error => {
+    console.error('資料載入失敗:', error);
+    document.getElementById('loadingOverlay').innerHTML = `
+      <div style="text-align:center;color:white">
+        <div style="font-size:48px;margin-bottom:20px">⚠️</div>
+        <h2 style="margin-bottom:12px">資料載入失敗</h2>
+        <p style="margin-bottom:24px">${error.message}</p>
+        <button class="btn" onclick="location.reload()">重新載入</button>
+      </div>`;
+  });
+
+  // Tab 切換
+  document.querySelectorAll('.main-tab, .mobile-nav-card').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.mobile-nav-card').forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      const mode = tab.dataset.mode;
+      const otherNav = tab.classList.contains('main-tab')
+        ? document.querySelector(`.mobile-nav-card[data-mode="${mode}"]`)
+        : document.querySelector(`.main-tab[data-mode="${mode}"]`);
+      if(otherNav) otherNav.classList.add('active');
+      document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
+      currentMode = mode;
+      const modeMap = {dashboard:'dashboardMode',changes:'changesMode',history:'historyMode',search:'searchMode',ranking:'rankingMode'};
+      document.getElementById(modeMap[currentMode]).classList.remove('hidden');
+      if(mode === 'ranking') renderRanking();
+    });
+  });
+
+  document.getElementById('etfTabs').addEventListener('click', e => {
+    if(e.target.classList.contains('etf-tab')){
+      document.querySelectorAll('#etfTabs .etf-tab').forEach(t => t.classList.remove('active'));
+      e.target.classList.add('active');
+      currentETF = e.target.dataset.etf;
+      renderChanges();
+    }
+  });
+  document.getElementById('dashboardEtfTabs').addEventListener('click', e => {
+    if(e.target.classList.contains('etf-tab')){
+      document.querySelectorAll('#dashboardEtfTabs .etf-tab').forEach(t => t.classList.remove('active'));
+      e.target.classList.add('active');
+      dashboardETF = e.target.dataset.etf;
+      renderCalendar();
+    }
+  });
+});
+
+// ===== ETF Tab 建構 =====
+const ETF_ORDER = ['00981A','00992A','00980A','00982A'];
+function buildETFTabs(){
+  const allEntries = Object.entries(processedData).map(([code,data]) => ({
+    code, name: getShortName(code, data.name || data.etf_name || code)
+  }));
+  allEntries.sort((a,b) => {
+    const ai = ETF_ORDER.indexOf(a.code), bi = ETF_ORDER.indexOf(b.code);
+    if(ai !== -1 && bi !== -1) return ai - bi;
+    if(ai !== -1) return -1;
+    if(bi !== -1) return 1;
+    return a.code.localeCompare(b.code);
+  });
+  if(allEntries.length === 0) return;
+  currentETF  = allEntries[0].code;
+  dashboardETF = allEntries[0].code;
+  const makeBtn = (code, name, isFirst) =>
+    `<button class="etf-tab${isFirst?' active':''}" data-etf="${code}">${code} ${name}</button>`;
+  const dashTabs = document.getElementById('dashboardEtfTabs');
+  if(dashTabs) dashTabs.innerHTML = allEntries.map((e,i) => makeBtn(e.code, e.name, i===0)).join('');
+  const changeTabs = document.getElementById('etfTabs');
+  if(changeTabs) changeTabs.innerHTML = allEntries.map((e,i) => makeBtn(e.code, e.name, i===0)).join('');
+  const histSelect = document.getElementById('historyETF');
+  if(histSelect) histSelect.innerHTML = allEntries.map(e => `<option value="${e.code}">${e.code} ${e.name}</option>`).join('');
+}
+
+// ===== 週曆 =====
+function getWeekRange(offset=0){
+  if(!latestDataDate || isNaN(latestDataDate.getTime())) return {start:new Date(), end:new Date(), dates:[]};
+  const baseDate = new Date(latestDataDate);
+  const dayOfWeek = baseDate.getDay();
+  let anchor = new Date(baseDate);
+  if(dayOfWeek === 6) anchor.setDate(baseDate.getDate()-1);
+  else if(dayOfWeek === 0) anchor.setDate(baseDate.getDate()-2);
+  const anchorDay = anchor.getDay();
+  const monday = new Date(anchor);
+  monday.setDate(anchor.getDate() - (anchorDay-1) + offset*7);
+  const weekStart = new Date(monday);
+  const weekEnd   = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate()+4);
+  return {start:weekStart, end:weekEnd, dates:getDatesInRange(new Date(weekStart.getTime()-86400000), weekEnd)};
+}
+function getDatesInRange(start, end){
+  const dates = []; let current = new Date(start);
+  current.setDate(current.getDate()+1);
+  while(current <= end){
+    const day = current.getDay();
+    if(day !== 0 && day !== 6) dates.push(new Date(current));
+    current.setDate(current.getDate()+1);
+  }
+  return dates;
+}
+function formatDate(date){
+  if(!date) return '';
+  const year = date.getFullYear();
+  const month = String(date.getMonth()+1).padStart(2,'0');
+  const day   = String(date.getDate()).padStart(2,'0');
+  return `${year}${month}${day}`;
+}
+function getDayName(date){ return ['日','一','二','三','四','五','六'][date.getDay()]; }
+function changeWeek(offset){ currentWeekOffset += offset; renderCalendar(); }
+function goToLatest(){ currentWeekOffset = 0; renderCalendar(); }
+
+function renderCalendar(){
+  if(!dashboardETF) return;
+  const weekRange = getWeekRange(currentWeekOffset);
+  document.getElementById('weekRange').textContent = formatDate(weekRange.start)+' - '+formatDate(weekRange.end);
+  const isLatestWeek = latestDataDate <= weekRange.end && latestDataDate >= weekRange.start;
+  document.getElementById('nextWeekBtn').disabled = (latestDataDate <= weekRange.end);
+  document.getElementById('prevWeekBtn').disabled = false;
+  document.getElementById('latestBtn').style.display = isLatestWeek ? 'none' : 'block';
+  if(!weekRange.dates.length){
+    document.getElementById('calendarContainer').innerHTML = '<p class="no-data">本週無資料</p>';
+    document.getElementById('mobileCalendar').innerHTML = '<p class="no-data">本週無資料</p>';
+    return;
+  }
+  let tableHTML = `<table class="calendar-table"><thead><tr>`;
+  weekRange.dates.forEach(date => {
+    tableHTML += `<th>${getDayName(date)}<br><span style="font-size:14px;opacity:0.9">${date.getMonth()+1}/${date.getDate()}</span></th>`;
+  });
+  tableHTML += `</tr></thead><tbody><tr>`;
+  weekRange.dates.forEach(date => {
+    const dateStr = formatDate(date);
+    const isToday = latestDataDate && dateStr === formatDate(latestDataDate);
+    const dayChanges = getChangesForDate(dateStr, dashboardETF);
+    tableHTML += `<td${isToday?' class="today-marker"':''}>`;
+    if(dayChanges.new.length > 0){
+      tableHTML += `<div class="change-section"><div class="change-section-title new">🟢 新增 ${dayChanges.new.length}</div><div class="stock-mini-list">`;
+      tableHTML += dayChanges.new.slice(0,5).map(stock =>
+        `<div class="stock-mini-item new" onclick="showStockDetail('${stock.code}','${dashboardETF}')">
+          <span class="stock-code">${stock.code}</span>
+          <span class="stock-name">${stock.name}</span>
+          <span class="stock-count">${stock.count}</span></div>`).join('');
+      if(dayChanges.new.length > 5) tableHTML += `<div style="text-align:center;color:var(--text-light);font-size:13px;margin-top:8px">還有 ${dayChanges.new.length-5} 檔...</div>`;
+      tableHTML += `</div></div>`;
+    }
+    if(dayChanges.deleted.length > 0){
+      tableHTML += `<div class="change-section"><div class="change-section-title delete">🔴 刪除 ${dayChanges.deleted.length}</div><div class="stock-mini-list">`;
+      tableHTML += dayChanges.deleted.slice(0,5).map(stock =>
+        `<div class="stock-mini-item delete" onclick="showStockDetail('${stock.code}','${dashboardETF}')">
+          <span class="stock-code">${stock.code}</span>
+          <span class="stock-name">${stock.name}</span></div>`).join('');
+      if(dayChanges.deleted.length > 5) tableHTML += `<div style="text-align:center;color:var(--text-light);font-size:13px;margin-top:8px">還有 ${dayChanges.deleted.length-5} 檔...</div>`;
+      tableHTML += `</div></div>`;
+    }
+    if(!dayChanges.new.length && !dayChanges.deleted.length) tableHTML += `<div class="no-data" style="padding:20px">－</div>`;
+    tableHTML += `</td>`;
+  });
+  tableHTML += `</tr></tbody></table>`;
+  document.getElementById('calendarContainer').innerHTML = tableHTML;
+
+  let mobileHTML = '';
+  weekRange.dates.forEach(date => {
+    const dateStr = formatDate(date);
+    const isToday = latestDataDate && dateStr === formatDate(latestDataDate);
+    const dayChanges = getChangesForDate(dateStr, dashboardETF);
+    mobileHTML += `<div class="mobile-day-card${isToday?' today-marker':''}">
+      <div class="mobile-day-header">
+        <div><div class="mobile-day-title">週${getDayName(date)}</div>
+        <div class="mobile-day-date">${date.getMonth()+1}/${date.getDate()}</div></div>
+        ${isToday?'<div class="mobile-today-badge">今日</div>':''}
+      </div>`;
+    if(dayChanges.new.length > 0){
+      mobileHTML += `<div class="change-section"><div class="change-section-title new">🟢 新增 ${dayChanges.new.length}</div><div class="stock-mini-list">`;
+      mobileHTML += dayChanges.new.map(s =>
+        `<div class="stock-mini-item new" onclick="showStockDetail('${s.code}','${dashboardETF}')">
+          <span class="stock-code">${s.code}</span><span class="stock-name">${s.name}</span><span class="stock-count">${s.count}</span></div>`).join('');
+      mobileHTML += `</div></div>`;
+    }
+    if(dayChanges.deleted.length > 0){
+      mobileHTML += `<div class="change-section"><div class="change-section-title delete">🔴 刪除 ${dayChanges.deleted.length}</div><div class="stock-mini-list">`;
+      mobileHTML += dayChanges.deleted.map(s =>
+        `<div class="stock-mini-item delete" onclick="showStockDetail('${s.code}','${dashboardETF}')">
+          <span class="stock-code">${s.code}</span><span class="stock-name">${s.name}</span></div>`).join('');
+      mobileHTML += `</div></div>`;
+    }
+    if(!dayChanges.new.length && !dayChanges.deleted.length) mobileHTML += `<div class="no-data" style="padding:22px">本日無異動</div>`;
+    mobileHTML += `</div>`;
+  });
+  document.getElementById('mobileCalendar').innerHTML = mobileHTML;
+}
+
+function getChangesForDate(dateStr, etf){
+  const newStocks=[], deletedStocks=[];
+  for(const [stockCode, stockInfo] of Object.entries(stockData)){
+    const etfInfo = stockInfo.etf_holdings?.[etf];
+    if(!etfInfo || !etfInfo.history) continue;
+    const record = etfInfo.history.find(r => r.date === dateStr);
+    if(!record) continue;
+    if(record.status === '新增') newStocks.push({code:stockCode, name:stockInfo.name, count:record.count, date:dateStr});
+    else if(record.status === '首次出現') newStocks.push({code:stockCode, name:stockInfo.name, count:record.count, date:dateStr});
+    else if(record.status === '出清' || record.status === '刪除') deletedStocks.push({code:stockCode, name:stockInfo.name, date:dateStr});
+  }
+  return {new:newStocks, deleted:deletedStocks};
+}
+
+// ===== 最新異動 =====
+function renderChanges(){
+  if(!currentETF) return;
+  const data = processedData[currentETF];
+  if(!data || !data.daily_changes || data.daily_changes.length === 0){
+    document.getElementById('changesGrid').innerHTML = '<p class="no-data">目前無異動資料</p>';
+    return;
+  }
+  document.getElementById('changesDateTitle').textContent = data.latest_date;
+  const grid = document.getElementById('changesGrid');
+  grid.innerHTML = data.daily_changes.map(change => {
+    const typeClass = change.type==='新增'?'new-add':change.type==='刪除'?'delete':'';
+    const badgeClass = change.type==='新增'?'new':change.type==='刪除'?'delete':'';
+    return `<div class="change-card ${typeClass}" onclick="showStockDetail('${change.code}','${currentETF}')">
+      <div class="change-card-header">
+        <div><div class="change-code">${change.code}</div><div class="change-name">${change.name}</div></div>
+        <span class="badge ${badgeClass}">${change.type}</span>
+      </div>
+      <div class="change-stats">
+        <div class="stat-item"><div class="stat-label">目前張數</div><div class="stat-value">${change.current_count ?? 0}</div></div>
+        <div class="stat-item"><div class="stat-label">目前權重</div><div class="stat-value">${change.current_weight ?? 0}%</div></div>
+        <div class="stat-item"><div class="stat-label">張數變化</div>
+          <div class="stat-value ${change.count_change>0?'positive':change.count_change<0?'negative':''}">
+            ${change.count_change>0?'+':''}${change.count_change ?? 0}</div></div>
+        <div class="stat-item"><div class="stat-label">權重變化</div>
+          <div class="stat-value ${change.weight_change>0?'positive':change.weight_change<0?'negative':''}">
+            ${change.weight_change>0?'+':''}${change.weight_change ?? 0}%</div></div>
+      </div></div>`;
+  }).join('');
+}
+
+// ===== 歷史查詢 =====
+function loadHistoryData(targetDate){
+  if(targetDate) document.getElementById('historyDate').value = targetDate.replace(/\//g,'-');
+  const selectedDate = document.getElementById('historyDate').value;
+  const selectedETF  = document.getElementById('historyETF').value;
+  if(!selectedDate){ document.getElementById('historyGrid').innerHTML='<p class="no-data">請選擇日期</p>'; return; }
+  const formattedDate = selectedDate.replace(/-/g,'');
+  const dateIndex = allDates.indexOf(formattedDate);
+  if(dateIndex === -1){
+    const inputTs = new Date(selectedDate).getTime();
+    let closest = allDates[0], minDiff = Infinity;
+    for(const d of allDates){ const diff = Math.abs(new Date(d.replace(/(\d{4})(\d{2})(\d{2})/,'$1-$2-$3')).getTime()-inputTs); if(diff<minDiff){minDiff=diff;closest=d;} }
+    document.getElementById('historyGrid').innerHTML=`<p class="no-data">${formattedDate} 無資料，自動跳至 ${closest}</p>`;
+    setTimeout(()=>loadHistoryData(closest),700); return;
+  }
+  const navBar = document.getElementById('historyNavBar');
+  navBar.style.display = 'flex';
+  document.getElementById('historyNavLabel').textContent = `${formattedDate}  (第 ${dateIndex+1} / ${allDates.length} 筆)`;
+  document.getElementById('historyPrevBtn').disabled = dateIndex >= allDates.length-1;
+  document.getElementById('historyNextBtn').disabled = dateIndex <= 0;
+  const changes = [];
+  for(const [stockCode, stockInfo] of Object.entries(stockData)){
+    const etfInfo = stockInfo.etf_holdings?.[selectedETF];
+    if(!etfInfo || !etfInfo.history) continue;
+    const recIdx = etfInfo.history.findIndex(r => r.date === formattedDate);
+    if(recIdx === -1) continue;
+    const record = etfInfo.history[recIdx];
+    if(!record || !record.status) continue;
+    let cc = record.count_change, wc = record.weight_change;
+    if(record.status === '首次出現'){ cc = record.count ?? 0; wc = record.weight ?? 0; }
+    else if(record.status === '出清'){ if(!cc && recIdx>0){ const prev=etfInfo.history[recIdx-1]; cc=-(prev.count??0); wc=-(prev.weight??0); } }
+    else { if(cc==null && recIdx>0){ const prev=etfInfo.history[recIdx-1]; cc=(record.count??0)-(prev.count??0); wc=parseFloat(((record.weight??0)-(prev.weight??0)).toFixed(4)); } }
+    changes.push({code:stockCode, name:stockInfo.name, ...record, count_change:cc, weight_change:wc});
+  }
+  document.getElementById('historySummary').innerHTML = `
+    <div class="summary-card"><div class="label">總異動</div><div class="value">${changes.length}</div></div>
+    <div class="summary-card"><div class="label">首次出現</div><div class="value success">${changes.filter(c=>c.status==='首次出現').length}</div></div>
+    <div class="summary-card"><div class="label">新增</div><div class="value success">${changes.filter(c=>c.status==='新增').length}</div></div>
+    <div class="summary-card"><div class="label">增持</div><div class="value success">${changes.filter(c=>c.status==='增持').length}</div></div>
+    <div class="summary-card"><div class="label">出清/刪除</div><div class="value danger">${changes.filter(c=>c.status==='出清'||c.status==='刪除').length}</div></div>`;
+  const grid = document.getElementById('historyGrid');
+  if(!changes.length){ grid.innerHTML='<p class="no-data">此日期無異動資料</p>'; return; }
+  const statusOrder = {'首次出現':0,'新增':1,'增持':2,'減持':3,'出清':4,'刪除':5};
+  changes.sort((a,b)=>{ const so=(statusOrder[a.status]??9)-(statusOrder[b.status]??9); return so!==0?so:Math.abs(b.count_change??0)-Math.abs(a.count_change??0); });
+  grid.innerHTML = changes.map(change => {
+    const typeClass = (change.status==='首次出現'||change.status==='新增')?'new-add':(change.status==='出清'||change.status==='刪除')?'delete':'';
+    const badgeClass = (change.status==='首次出現'||change.status==='新增')?'new':(change.status==='出清'||change.status==='刪除')?'delete':'';
+    const cc = change.count_change??0, wc = change.weight_change??0;
+    const ccLabel = (change.status==='首次出現'||change.status==='新增')?cc:(change.status==='出清'||change.status==='刪除')?cc:(cc>0?'+'+cc:cc);
+    const wcLabel = (change.status==='首次出現'||change.status==='新增')?wc:(change.status==='出清'||change.status==='刪除')?wc:(wc>0?'+'+wc:wc);
+    return `<div class="change-card ${typeClass}" onclick="showStockDetail('${change.code}','${selectedETF}')">
+      <div class="change-card-header">
+        <div><div class="change-code">${change.code}</div><div class="change-name">${change.name}</div></div>
+        <span class="badge ${badgeClass}">${change.status}</span>
+      </div>
+      <div class="change-stats">
+        <div class="stat-item"><div class="stat-label">張數</div><div class="stat-value">${change.count??'-'}</div></div>
+        <div class="stat-item"><div class="stat-label">權重</div><div class="stat-value">${change.weight!=null?change.weight+'%':'-'}</div></div>
+        <div class="stat-item"><div class="stat-label">張數變化</div>
+          <div class="stat-value ${cc>0?'positive':cc<0?'negative':''}">${ccLabel}</div></div>
+        <div class="stat-item"><div class="stat-label">權重變化</div>
+          <div class="stat-value ${wc>0?'positive':wc<0?'negative':''}">${wcLabel}%</div></div>
+      </div></div>`;
+  }).join('');
+}
+function shiftHistoryDate(direction){
+  const val = document.getElementById('historyDate').value;
+  if(!val) return;
+  const idx = allDates.indexOf(val.replace(/-/g,''));
+  if(idx===-1) return;
+  const newIdx = idx - direction;
+  if(newIdx<0 || newIdx>=allDates.length) return;
+  loadHistoryData(allDates[newIdx]);
+}
+
+// ===== 股票搜尋 =====
+function renderSearchResults(results){
+  const grid = document.getElementById('searchResults');
+  if(!results.length){ grid.innerHTML='<p class="no-data">無符合結果</p>'; return; }
+  grid.innerHTML = results.map(stock => {
+    const etfCount = Object.keys(stock.holdings||{}).length;
+    const totalCount = Object.values(stock.holdings||{}).reduce((sum,h)=>sum+(h.current_count||0),0);
+    const firstETF = Object.keys(stock.holdings||{})[0];
+    return `<div class="change-card" onclick="showStockDetail('${stock.code}','${firstETF}')">
+      <div class="change-card-header">
+        <div><div class="change-code">${stock.code}</div><div class="change-name">${stock.name}</div></div>
+      </div>
+      <div class="change-stats">
+        <div class="stat-item"><div class="stat-label">持有ETF數</div><div class="stat-value">${etfCount}</div></div>
+        <div class="stat-item"><div class="stat-label">合計張數</div><div class="stat-value">${totalCount}</div></div>
+      </div></div>`;
+  }).join('');
+}
+
+// ===== 排序切換函數 =====
+function sortRanking(col) {
+  if (rankSortCol === col) {
+    rankSortAsc = !rankSortAsc;
+  } else {
+    rankSortCol = col;
+    rankSortAsc = false; // 預設新欄位為由大到小排序
+  }
+  renderRanking();
+}
+
+// ===== ETF排行榜 =====
+function renderRanking(){
+  if(!rankingData){ document.getElementById('rankingTableContainer').innerHTML='<div class="no-data">排行資料尚未載入，請確認 active_etf_ranking.json 已部署</div>'; return; }
+  const trackedCodes = new Set(Object.keys(processedData||{}));
+
+  // 排序邏輯
+  let sortedData = [...rankingData.ranking];
+  sortedData.sort((a, b) => {
+    let valA = a[rankSortCol] ?? -Infinity;
+    let valB = b[rankSortCol] ?? -Infinity;
+    return rankSortAsc ? valA - valB : valB - valA;
+  });
+
+  const fmtRet = v => {
+    if(v==null) return '<span class="return-null">--</span>';
+    const cls = v>0?'return-positive':v<0?'return-negative':'';
+    return `<span class="${cls}">${v>0?'+':''}${v.toFixed(2)}%</span>`;
+  };
+  const rankBadge = r => {
+    if(!r) return '<span class="rank-badge rank-other">--</span>';
+    const cls = r===1?'rank-1':r===2?'rank-2':r===3?'rank-3':'rank-other';
+    return `<span class="rank-badge ${cls}">${r}</span>`;
+  };
+  
+  // 建立表頭，加入排序箭頭提示
+  const getTh = (col, text) => {
+    let icon = col === rankSortCol ? (rankSortAsc ? '▲' : '▼') : '<span style="color:transparent">▲</span>';
+    return `<th class="sortable" onclick="sortRanking('${col}')">${text} <span class="sort-icon">${icon}</span></th>`;
+  };
+
+  let html = `<table class="ranking-table"><thead><tr>
+    <th>排名</th><th>代碼</th><th>名稱</th>
+    ${getTh('return_1d', '今日')}
+    ${getTh('return_1w', '本週')}
+    ${getTh('return_1m', '本月')}
+    ${getTh('return_3m', '三個月')}
+    ${getTh('return_6m', '六個月')}
+    ${getTh('return_ytd', '今年')}
+  </tr></thead><tbody>`;
+
+  for(const etf of sortedData){
+    const isTracked = trackedCodes.has(etf.code);
+    const shortName = getShortName(etf.code, etf.name.replace(/^主動/,''));
+    html += `<tr class="${isTracked?'tracked-etf':''}">
+      <td>${rankBadge(etf.rank)}</td>
+      <td style="font-weight:800;color:var(--text)">${etf.code}${isTracked?'<span class="tracked-tag">追蹤中</span>':''}</td>
+      <td style="text-align:left;font-weight:600">${shortName}</td>
+      <td>${fmtRet(etf.return_1d)}</td>
+      <td>${fmtRet(etf.return_1w)}</td>
+      <td>${fmtRet(etf.return_1m)}</td>
+      <td style="font-weight:800;font-size:15px">${fmtRet(etf.return_3m)}</td>
+      <td>${fmtRet(etf.return_6m)}</td>
+      <td>${fmtRet(etf.return_ytd)}</td>
+    </tr>`;
+  }
+  html += `</tbody></table>`;
+  document.getElementById('rankingTableContainer').innerHTML = html;
+}
+
+// ===== 股票明細 Modal =====
+function showStockDetail(stockCode, preferredETF=null){
+  const stock = stockData[stockCode];
+  if(!stock || !stock.etf_holdings){ alert('找不到股票資料'); return; }
+  const etfList = Object.keys(stock.etf_holdings);
+  if(!etfList.length){ alert('此股票無ETF持股資料'); return; }
+  const firstETF = (preferredETF && etfList.includes(preferredETF)) ? preferredETF : etfList[0];
+
+  const etfTabs = etfList.map(etf => {
+    const data = stock.etf_holdings[etf];
+    const tabName = getShortName(etf, data.etf_name||etf);
+    return `<button class="modal-etf-tab${etf===firstETF?' active':''}" data-etf="${etf}"
+      onclick="switchModalETF(event,'${stockCode}','${etf}')">${etf} ${tabName}</button>`;
+  }).join('');
+
+  const etfContents = etfList.map(etf => {
+    const data = stock.etf_holdings[etf];
+    const canvasId = ('chart_'+stockCode+'_'+etf).replace(/[^a-zA-Z0-9]/g,'_');
+    return `<div class="etf-content${etf===firstETF?' active':''}" data-etf="${etf}">
+      <div class="modal-stats">
+        <div class="modal-stat-card"><div class="label">目前張數</div><div class="value primary">${data.current_count??0}</div><div class="sub">張</div></div>
+        <div class="modal-stat-card"><div class="label">目前權重</div><div class="value">${data.current_weight??0}%</div></div>
+        <div class="modal-stat-card"><div class="label">最高張數</div><div class="value success">${data.max_count??0}</div><div class="sub">${data.max_count_date}</div></div>
+        <div class="modal-stat-card"><div class="label">最低張數</div><div class="value danger">${data.min_count??0}</div><div class="sub">${data.min_count_date}</div></div>
+      </div>
+      
+      <div class="chart-container">
+        <h3>📈 持股歷史走勢</h3>
+        <div class="chart-hint">🖱 拖曳下方水平捲軸平移 &nbsp;|&nbsp; 觸碰圖表任何位置顯示資訊</div>
+        <div class="canvas-scroll-wrapper" style="width: 100%; overflow-x: auto; overflow-y: hidden; padding-bottom: 8px;">
+          <div id="wrapper_${canvasId}" style="height: 300px; min-width: 100%;">
+            <canvas id="${canvasId}"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-table">
+        <table><thead><tr><th>日期</th><th>張數</th><th>權重</th><th>張數±</th><th>權重±</th><th>狀態</th></tr></thead>
+        <tbody>${(data.history||[]).slice().reverse().map(r => `<tr>
+          <td style="font-weight:700">${r.date}</td>
+          <td style="font-weight:800">${r.count}</td>
+          <td>${r.weight}%</td>
+          <td style="color:${(r.count_change??0)>0?'var(--success)':(r.count_change??0)<0?'var(--danger)':'inherit'};font-weight:800">
+            ${(r.count_change??0)>0?'+':''}${r.count_change??0}</td>
+          <td style="color:${(r.weight_change??0)>0?'var(--success)':(r.weight_change??0)<0?'var(--danger)':'inherit'};font-weight:700">
+            ${(r.weight_change??0)>0?'+':''}${r.weight_change??0}%</td>
+          <td><span style="padding:4px 6px;border-radius:8px;font-size:10px;font-weight:700;display:inline-block;
+            background:${r.status==='新增'||r.status==='首次出現'?'rgba(16,185,129,0.15)':r.status==='出清'||r.status==='刪除'?'rgba(239,68,68,0.15)':'var(--bg-light)'};
+            color:${r.status==='新增'||r.status==='首次出現'?'var(--success)':r.status==='出清'||r.status==='刪除'?'var(--danger)':'var(--text-light)'}"
+          >${r.status}</span></td>
+        </tr>`).join('')}</tbody></table>
+      </div>
+    </div>`;
+  }).join('');
+
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.onclick = e => { if(e.target===modal) modal.remove(); };
+  modal.innerHTML = `<div class="modal-content" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <button class="modal-close-btn" onclick="this.closest('.modal-overlay').remove()" title="關閉">✕</button>
+      <h2>${stockCode} ${stock.name}</h2>
+      <p>點擊下方ETF查看各基金持股紀錄</p>
+    </div>
+    <div class="modal-etf-tabs">${etfTabs}</div>
+    <div id="etfContentsContainer">${etfContents}</div>
+    <div class="close-btn"><button class="btn" onclick="this.closest('.modal-overlay').remove()">關閉</button></div>
+  </div>`;
+  document.body.appendChild(modal);
+
+  const firstData = stock.etf_holdings[firstETF];
+  const firstCanvasId = ('chart_'+stockCode+'_'+firstETF).replace(/[^a-zA-Z0-9]/g,'_');
+  setTimeout(() => drawTrendChart(firstCanvasId, firstData.history), 100);
+}
+
+function switchModalETF(event, stockCode, etfCode){
+  event.stopPropagation();
+  document.querySelectorAll('.modal-etf-tab').forEach(tab => tab.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.querySelectorAll('.etf-content').forEach(c => c.classList.remove('active'));
+  const targetContent = document.querySelector(`.etf-content[data-etf="${etfCode}"]`);
+  if(targetContent) targetContent.classList.add('active');
+  const stock = stockData[stockCode];
+  if(stock && stock.etf_holdings[etfCode]){
+    const canvasId = ('chart_'+stockCode+'_'+etfCode).replace(/[^a-zA-Z0-9]/g,'_');
+    setTimeout(() => drawTrendChart(canvasId, stock.etf_holdings[etfCode].history), 100);
+  }
+}
+
+// ===== 折線圖（含縮放/拖曳修復）=====
+function drawTrendChart(canvasId, history){
+  if(!history || history.length === 0) return;
+  if(chartInstances.has(canvasId)) chartInstances.get(canvasId).destroy();
+  const sortedHistory = [...history].sort((a,b)=>a.date.localeCompare(b.date));
+  const labels = sortedHistory.map(h => h.date);
+  const counts = sortedHistory.map(h => h.count);
+  const canvas = document.getElementById(canvasId);
+  if(!canvas) return;
+
+  // 動態計算封裝層的寬度以確保出現水平拖曳捲軸
+  const wrapper = document.getElementById('wrapper_' + canvasId);
+  if(wrapper) {
+      const minWidthCalc = labels.length * 15; // 每個資料點分配 15px
+      wrapper.style.width = Math.max(wrapper.parentElement.clientWidth, minWidthCalc) + 'px';
+  }
+
+  // 重置縮放按鈕
+  const container = canvas.closest('.chart-container');
+  if(container && !container.querySelector('.reset-zoom-btn')){
+    const resetBtn = document.createElement('button');
+    resetBtn.className = 'reset-zoom-btn';
+    resetBtn.textContent = '⟳ 重置縮放';
+    resetBtn.onclick = () => { const chart = chartInstances.get(canvasId); if(chart) chart.resetZoom(); };
+    container.appendChild(resetBtn);
+  }
+
+  const ctx = canvas.getContext('2d');
+  const newChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets:[{
+        label:'張數', data:counts,
+        borderColor:'#4F46E5', backgroundColor:'rgba(79,70,229,0.1)',
+        borderWidth:3, fill:true, tension:0.4,
+        pointRadius: counts.length>50 ? 0 : 4,
+        pointBackgroundColor:'#4F46E5', pointBorderColor:'white',
+        pointBorderWidth:2, pointHoverRadius:6,
+      }]
+    },
+    options:{
+      responsive:true, 
+      maintainAspectRatio:false, // 重要：設定為 false 以配合我們封裝層設定好的 300px 高度
+      interaction: {
+        mode: 'index',   // 修正點位太小時摸不到的問題
+        intersect: false // 只要游標對齊水平座標就顯示 Tooltip
+      },
+      plugins:{
+        legend:{display:false},
+        tooltip:{backgroundColor:'rgba(15,23,42,0.9)',padding:12,
+          titleFont:{size:14,weight:'bold'},bodyFont:{size:13},cornerRadius:8},
+        zoom:{
+          zoom:{ wheel:{enabled:true}, pinch:{enabled:true}, mode:'x' },
+          pan:{ enabled:true, mode:'x' },
+        }
+      },
+      scales:{
+        y:{beginAtZero:false, grid:{color:'rgba(0,0,0,0.05)'}, ticks:{font:{size:12,weight:'600'}}},
+        x:{grid:{display:false}, ticks:{font:{size:11,weight:'600'}, maxTicksLimit: labels.length > 50 ? Math.floor(labels.length/5) : 10}},
+      }
+    }
+  });
+  chartInstances.set(canvasId, newChart);
+}
+</script>
+</body>
+</html>
