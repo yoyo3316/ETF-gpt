@@ -1,249 +1,573 @@
 {
-  "00980A": {
-    "name": "野村臺灣智慧優選主動式ETF",
-    "latest_date": "2026/04/24",
-    "previous_date": "2026/04/23",
-    "price": "21.52",
-    "change_value": "+0.47",
-    "change_percent": "+2.23%",
-    "daily_changes": []
-  },
   "00981A": {
     "name": "統一台股增長",
-    "latest_date": "2026/04/24",
-    "previous_date": "2026/04/23",
-    "price": "27.80",
-    "change_value": "+1.18",
-    "change_percent": "+4.43%",
+    "latest_date": "2026/06/24",
+    "previous_date": "2026/06/23",
+    "price": "31.48",
+    "change_value": "-0.12",
+    "change_percent": "-0.38%",
     "daily_changes": [
       {
-        "code": "8046",
-        "name": "南電",
+        "code": "2303",
+        "name": "聯電",
         "type": "增持",
-        "count_change": 2625,
-        "weight_change": 1.21,
-        "prev_count": 9256,
-        "prev_weight": 3.69,
-        "current_count": 11881,
-        "current_weight": 4.9
+        "count_change": 6142,
+        "weight_change": 0.62,
+        "prev_count": 77390,
+        "prev_weight": 4.48,
+        "current_count": 83532,
+        "current_weight": 5.1
       },
       {
-        "code": "3189",
-        "name": "景碩",
+        "code": "3711",
+        "name": "日月光投控",
+        "type": "減持",
+        "count_change": -3790,
+        "weight_change": -0.87,
+        "prev_count": 17948,
+        "prev_weight": 4.04,
+        "current_count": 14158,
+        "current_weight": 3.17
+      },
+      {
+        "code": "8150",
+        "name": "南茂",
+        "type": "刪除",
+        "count_change": -1443,
+        "weight_change": -0.05,
+        "prev_count": 1444,
+        "prev_weight": 0.05,
+        "current_count": 1,
+        "current_weight": 0
+      },
+      {
+        "code": "2308",
+        "name": "台達電",
+        "type": "減持",
+        "count_change": -312,
+        "weight_change": -0.35,
+        "prev_count": 6222,
+        "prev_weight": 4.4,
+        "current_count": 5910,
+        "current_weight": 4.05
+      },
+      {
+        "code": "6223",
+        "name": "旺矽",
         "type": "增持",
-        "count_change": 2086,
-        "weight_change": 0.54,
-        "prev_count": 2952,
-        "prev_weight": 0.71,
-        "current_count": 5038,
-        "current_weight": 1.25
+        "count_change": 73,
+        "weight_change": 0.61,
+        "prev_count": 2279,
+        "prev_weight": 5.18,
+        "current_count": 2352,
+        "current_weight": 5.79
       },
       {
         "code": "2454",
         "name": "聯發科",
         "type": "增持",
-        "count_change": 572,
-        "weight_change": 0.78,
-        "prev_count": 3295,
-        "prev_weight": 3.66,
-        "current_count": 3867,
-        "current_weight": 4.44
-      },
-      {
-        "code": "2368",
-        "name": "金像電",
-        "type": "增持",
-        "count_change": 359,
-        "weight_change": 0.4,
-        "prev_count": 7389,
-        "prev_weight": 4.68,
-        "current_count": 7748,
-        "current_weight": 5.08
-      },
-      {
-        "code": "2383",
-        "name": "台光電",
-        "type": "增持",
-        "count_change": 221,
-        "weight_change": 0.68,
-        "prev_count": 3904,
-        "prev_weight": 8.02,
-        "current_count": 4125,
-        "current_weight": 8.7
-      },
-      {
-        "code": "2345",
-        "name": "智邦",
-        "type": "增持",
-        "count_change": 174,
-        "weight_change": 0.01,
-        "prev_count": 5057,
-        "prev_weight": 5.27,
-        "current_count": 5231,
-        "current_weight": 5.28
-      },
-      {
-        "code": "3665",
-        "name": "貿聯-KY",
-        "type": "增持",
-        "count_change": 164,
-        "weight_change": -0.09,
-        "prev_count": 3933,
-        "prev_weight": 5.43,
-        "current_count": 4097,
-        "current_weight": 5.34
-      },
-      {
-        "code": "6669",
-        "name": "緯穎",
-        "type": "增持",
-        "count_change": 149,
-        "weight_change": 0.38,
-        "prev_count": 952,
-        "prev_weight": 2.03,
-        "current_count": 1101,
-        "current_weight": 2.41
-      },
-      {
-        "code": "6510",
-        "name": "精測",
-        "type": "增持",
-        "count_change": 94,
-        "weight_change": -0.01,
-        "prev_count": 781,
-        "prev_weight": 1.51,
-        "current_count": 875,
-        "current_weight": 1.5
-      },
-      {
-        "code": "3017",
-        "name": "奇鋐",
-        "type": "增持",
-        "count_change": 57,
-        "weight_change": 0.26,
-        "prev_count": 3845,
-        "prev_weight": 5.16,
-        "current_count": 3902,
-        "current_weight": 5.42
-      },
-      {
-        "code": "3583",
-        "name": "辛耘",
-        "type": "刪除",
-        "count_change": -57,
-        "weight_change": -0.03,
-        "prev_count": 57,
-        "prev_weight": 0.03,
-        "current_count": 0,
-        "current_weight": 0.0
-      },
-      {
-        "code": "2330",
-        "name": "台積電",
-        "type": "增持",
-        "count_change": 1,
-        "weight_change": -0.1,
-        "prev_count": 9113,
-        "prev_weight": 9.49,
-        "current_count": 9114,
-        "current_weight": 9.39
+        "count_change": 60,
+        "weight_change": -0.28,
+        "prev_count": 4977,
+        "prev_weight": 7.68,
+        "current_count": 5037,
+        "current_weight": 7.4
       }
     ]
   },
+  "00980A": {
+    "name": "野村臺灣智慧優選主動式ETF",
+    "latest_date": "2026/06/24",
+    "previous_date": "2026/06/23",
+    "price": "24.76",
+    "change_value": "-0.33",
+    "change_percent": "-1.32%",
+    "daily_changes": []
+  },
   "00982A": {
     "name": "群益台灣精選強棒主動式ETF基金",
-    "latest_date": "2026/04/24",
-    "previous_date": "2026/04/23",
-    "price": "20.85",
-    "change_value": "+0.50",
-    "change_percent": "+2.46%",
+    "latest_date": "2026/06/24",
+    "previous_date": "2026/06/23",
+    "price": "24.62",
+    "change_value": "-0.17",
+    "change_percent": "-0.69%",
     "daily_changes": [
       {
-        "code": "6805",
-        "name": "富世達",
+        "code": "6285",
+        "name": "啟碁",
         "type": "減持",
-        "count_change": -160,
-        "weight_change": -0.85,
-        "prev_count": 501,
-        "prev_weight": 2.53,
-        "current_count": 341,
-        "current_weight": 1.68
-      },
-      {
-        "code": "2360",
-        "name": "致茂",
-        "type": "減持",
-        "count_change": -104,
-        "weight_change": -0.67,
-        "prev_count": 828,
-        "prev_weight": 4.25,
-        "current_count": 724,
-        "current_weight": 3.58
-      },
-      {
-        "code": "2330",
-        "name": "台積電",
-        "type": "增持",
-        "count_change": 80,
-        "weight_change": 0.63,
-        "prev_count": 1468,
-        "prev_weight": 8.08,
-        "current_count": 1548,
-        "current_weight": 8.71
-      },
-      {
-        "code": "2454",
-        "name": "聯發科",
-        "type": "增持",
-        "count_change": 10,
-        "weight_change": 0.29,
-        "prev_count": 563,
-        "prev_weight": 3.3,
-        "current_count": 573,
-        "current_weight": 3.59
+        "count_change": -1007,
+        "weight_change": -0.47,
+        "prev_count": 2014,
+        "prev_weight": 0.95,
+        "current_count": 1007,
+        "current_weight": 0.48
       }
     ]
   },
   "00992A": {
     "name": "群益台灣科技創新主動式ETF",
-    "latest_date": "2026/04/24",
-    "previous_date": "2026/04/23",
-    "price": "16.93",
-    "change_value": "+0.27",
-    "change_percent": "+1.62%",
+    "latest_date": "2026/06/24",
+    "previous_date": "2026/06/23",
+    "price": "18.74",
+    "change_value": "-0.21",
+    "change_percent": "-1.11%",
     "daily_changes": [
       {
-        "code": "8358",
-        "name": "金居",
+        "code": "2308",
+        "name": "台達電",
+        "type": "刪除",
+        "count_change": -224,
+        "weight_change": -1.01,
+        "prev_count": 224,
+        "prev_weight": 1.01,
+        "current_count": 0,
+        "current_weight": 0.0
+      },
+      {
+        "code": "3653",
+        "name": "健策",
+        "type": "刪除",
+        "count_change": -132,
+        "weight_change": -1.1,
+        "prev_count": 132,
+        "prev_weight": 1.1,
+        "current_count": 0,
+        "current_weight": 0.0
+      }
+    ]
+  },
+  "00994A": {
+    "name": "第一金台股優選主動ETF",
+    "latest_date": "2026/06/24",
+    "previous_date": "2026/06/23",
+    "price": "17.94",
+    "change_value": "-0.13",
+    "change_percent": "-0.72%",
+    "daily_changes": [
+      {
+        "code": "2303",
+        "name": "聯電",
+        "type": "新增",
+        "count_change": 160,
+        "weight_change": 0.52,
+        "prev_count": 0,
+        "prev_weight": 0.0,
+        "current_count": 160,
+        "current_weight": 0.52
+      },
+      {
+        "code": "2368",
+        "name": "金像電",
         "type": "減持",
         "count_change": -40,
-        "weight_change": -0.08,
-        "prev_count": 1548,
-        "prev_weight": 1.2,
-        "current_count": 1508,
-        "current_weight": 1.12
+        "weight_change": -0.89,
+        "prev_count": 140,
+        "prev_weight": 3.17,
+        "current_count": 100,
+        "current_weight": 2.28
       },
       {
-        "code": "8021",
-        "name": "尖點",
+        "code": "2308",
+        "name": "台達電",
         "type": "減持",
         "count_change": -30,
-        "weight_change": -0.07,
-        "prev_count": 691,
-        "prev_weight": 0.68,
-        "current_count": 661,
-        "current_weight": 0.61
+        "weight_change": -1.22,
+        "prev_count": 128,
+        "prev_weight": 4.79,
+        "current_count": 98,
+        "current_weight": 3.57
       },
       {
-        "code": "2383",
-        "name": "台光電",
+        "code": "3653",
+        "name": "健策",
+        "type": "刪除",
+        "count_change": -20,
+        "weight_change": -1.38,
+        "prev_count": 20,
+        "prev_weight": 1.38,
+        "current_count": 0,
+        "current_weight": 0.0
+      },
+      {
+        "code": "2360",
+        "name": "致茂",
         "type": "減持",
-        "count_change": -1,
-        "weight_change": 0.34,
-        "prev_count": 538,
-        "prev_weight": 4.61,
-        "current_count": 537,
-        "current_weight": 4.95
+        "count_change": -15,
+        "weight_change": -0.66,
+        "prev_count": 52,
+        "prev_weight": 2.11,
+        "current_count": 37,
+        "current_weight": 1.45
+      },
+      {
+        "code": "4904",
+        "name": "遠傳",
+        "type": "新增",
+        "count_change": 10,
+        "weight_change": 0.02,
+        "prev_count": 0,
+        "prev_weight": 0,
+        "current_count": 10,
+        "current_weight": 0.02
+      },
+      {
+        "code": "3661",
+        "name": "世芯-KY",
+        "type": "刪除",
+        "count_change": -7,
+        "weight_change": -0.55,
+        "prev_count": 7,
+        "prev_weight": 0.55,
+        "current_count": 0,
+        "current_weight": 0.0
+      }
+    ]
+  },
+  "00995A": {
+    "name": "中信台灣卓越主動ETF",
+    "latest_date": "2026/06/24",
+    "previous_date": "2026/06/23",
+    "price": "18.04",
+    "change_value": "-0.28",
+    "change_percent": "-1.53%",
+    "daily_changes": [
+      {
+        "code": "3081",
+        "name": "聯亞光電工業",
+        "type": "減持",
+        "count_change": -3,
+        "weight_change": -0.13,
+        "prev_count": 9,
+        "prev_weight": 0.36,
+        "current_count": 6,
+        "current_weight": 0.23
+      },
+      {
+        "code": "2330",
+        "name": "台灣積體電路製造",
+        "type": "減持",
+        "count_change": -3,
+        "weight_change": -0.38,
+        "prev_count": 220,
+        "prev_weight": 9.6,
+        "current_count": 217,
+        "current_weight": 9.22
+      },
+      {
+        "code": "3661",
+        "name": "世芯電子",
+        "type": "減持",
+        "count_change": -2,
+        "weight_change": -0.15,
+        "prev_count": 5,
+        "prev_weight": 0.38,
+        "current_count": 3,
+        "current_weight": 0.23
+      }
+    ]
+  },
+  "00987A": {
+    "name": "台新優勢成長主動ETF",
+    "latest_date": "2026/06/24",
+    "previous_date": "2026/06/23",
+    "price": "17.48",
+    "change_value": "-0.09",
+    "change_percent": "-0.51%",
+    "daily_changes": []
+  },
+  "00991A": {
+    "name": "復華未來50主動ETF",
+    "latest_date": "2026/06/24",
+    "previous_date": "2026/06/23",
+    "price": "20.39",
+    "change_value": "-0.17",
+    "change_percent": "-0.83%",
+    "daily_changes": [
+      {
+        "code": "DA_NTD",
+        "name": "AFTER DEDUCTING SECURITIES PURCHASES AMOUNT",
+        "type": "減持",
+        "count_change": -324021,
+        "weight_change": -0.47,
+        "prev_count": -1216150,
+        "prev_weight": -1.81,
+        "current_count": -1540171,
+        "current_weight": -2.28
+      },
+      {
+        "code": "PB_NTD",
+        "name": "PAYABLES",
+        "type": "增持",
+        "count_change": 179473,
+        "weight_change": 0.27,
+        "prev_count": -266268,
+        "prev_weight": -0.4,
+        "current_count": -86795,
+        "current_weight": -0.13
+      },
+      {
+        "code": "2344",
+        "name": "華邦電子",
+        "type": "增持",
+        "count_change": 1300,
+        "weight_change": 0.32,
+        "prev_count": 6300,
+        "prev_weight": 1.99,
+        "current_count": 7600,
+        "current_weight": 2.31
+      },
+      {
+        "code": "3711",
+        "name": "日月光投",
+        "type": "增持",
+        "count_change": 1200,
+        "weight_change": 1.13,
+        "prev_count": 1400,
+        "prev_weight": 1.38,
+        "current_count": 2600,
+        "current_weight": 2.51
+      },
+      {
+        "code": "2303",
+        "name": "聯華電子",
+        "type": "增持",
+        "count_change": 1000,
+        "weight_change": 0.35,
+        "prev_count": 9000,
+        "prev_weight": 2.28,
+        "current_count": 10000,
+        "current_weight": 2.63
+      },
+      {
+        "code": "2368",
+        "name": "金像電子",
+        "type": "減持",
+        "count_change": -691,
+        "weight_change": -1.3,
+        "prev_count": 700,
+        "prev_weight": 1.32,
+        "current_count": 9,
+        "current_weight": 0.02
+      },
+      {
+        "code": "2308",
+        "name": "台達電子",
+        "type": "減持",
+        "count_change": -441,
+        "weight_change": -1.36,
+        "prev_count": 450,
+        "prev_weight": 1.39,
+        "current_count": 9,
+        "current_weight": 0.03
+      },
+      {
+        "code": "3017",
+        "name": "奇鋐科技",
+        "type": "減持",
+        "count_change": -391,
+        "weight_change": -1.42,
+        "prev_count": 400,
+        "prev_weight": 1.45,
+        "current_count": 9,
+        "current_weight": 0.03
+      },
+      {
+        "code": "8046",
+        "name": "南亞電路",
+        "type": "增持",
+        "count_change": 250,
+        "weight_change": 0.45,
+        "prev_count": 1650,
+        "prev_weight": 2.23,
+        "current_count": 1900,
+        "current_weight": 2.68
+      },
+      {
+        "code": "2408",
+        "name": "南亞科技",
+        "type": "增持",
+        "count_change": 200,
+        "weight_change": -0.05,
+        "prev_count": 8600,
+        "prev_weight": 5.82,
+        "current_count": 8800,
+        "current_weight": 5.77
+      },
+      {
+        "code": "6274",
+        "name": "台燿科技",
+        "type": "增持",
+        "count_change": 150,
+        "weight_change": 0.43,
+        "prev_count": 1450,
+        "prev_weight": 3.75,
+        "current_count": 1600,
+        "current_weight": 4.18
+      },
+      {
+        "code": "3037",
+        "name": "欣興電子",
+        "type": "增持",
+        "count_change": 150,
+        "weight_change": -0.03,
+        "prev_count": 3200,
+        "prev_weight": 4.64,
+        "current_count": 3350,
+        "current_weight": 4.61
+      },
+      {
+        "code": "6515",
+        "name": "穎崴科技",
+        "type": "增持",
+        "count_change": 70,
+        "weight_change": 0.98,
+        "prev_count": 100,
+        "prev_weight": 1.41,
+        "current_count": 170,
+        "current_weight": 2.39
+      },
+      {
+        "code": "8299",
+        "name": "群聯電子",
+        "type": "增持",
+        "count_change": 50,
+        "weight_change": 0.3,
+        "prev_count": 1450,
+        "prev_weight": 5.25,
+        "current_count": 1500,
+        "current_weight": 5.55
+      },
+      {
+        "code": "2345",
+        "name": "智邦科技",
+        "type": "增持",
+        "count_change": 40,
+        "weight_change": 0.04,
+        "prev_count": 900,
+        "prev_weight": 3.26,
+        "current_count": 940,
+        "current_weight": 3.3
+      },
+      {
+        "code": "2454",
+        "name": "聯發科技",
+        "type": "增持",
+        "count_change": 30,
+        "weight_change": -0.15,
+        "prev_count": 820,
+        "prev_weight": 5.54,
+        "current_count": 850,
+        "current_weight": 5.39
+      },
+      {
+        "code": "6223",
+        "name": "旺矽科技",
+        "type": "增持",
+        "count_change": 15,
+        "weight_change": 0.43,
+        "prev_count": 400,
+        "prev_weight": 3.98,
+        "current_count": 415,
+        "current_weight": 4.41
+      },
+      {
+        "code": "2059",
+        "name": "川湖科技",
+        "type": "增持",
+        "count_change": 10,
+        "weight_change": 0.1,
+        "prev_count": 290,
+        "prev_weight": 3.23,
+        "current_count": 300,
+        "current_weight": 3.33
+      },
+      {
+        "code": "5274",
+        "name": "信驊科技",
+        "type": "增持",
+        "count_change": 5,
+        "weight_change": 0.08,
+        "prev_count": 115,
+        "prev_weight": 3.17,
+        "current_count": 120,
+        "current_weight": 3.25
+      }
+    ]
+  },
+  "00403A": {
+    "name": "統一升級50主動ETF",
+    "latest_date": "2026/06/24",
+    "previous_date": "2026/06/23",
+    "price": "11.04",
+    "change_value": "-0.06",
+    "change_percent": "-0.54%",
+    "daily_changes": [
+      {
+        "code": "2303",
+        "name": "聯電",
+        "type": "增持",
+        "count_change": 600,
+        "weight_change": 0.47,
+        "prev_count": 74000,
+        "prev_weight": 7.19,
+        "current_count": 74600,
+        "current_weight": 7.66
+      },
+      {
+        "code": "2368",
+        "name": "金像電",
+        "type": "減持",
+        "count_change": -500,
+        "weight_change": -0.36,
+        "prev_count": 4700,
+        "prev_weight": 3.4,
+        "current_count": 4200,
+        "current_weight": 3.04
+      },
+      {
+        "code": "3189",
+        "name": "景碩",
+        "type": "增持",
+        "count_change": 228,
+        "weight_change": 0.12,
+        "prev_count": 1572,
+        "prev_weight": 0.65,
+        "current_count": 1800,
+        "current_weight": 0.77
+      },
+      {
+        "code": "3081",
+        "name": "聯亞",
+        "type": "減持",
+        "count_change": -80,
+        "weight_change": -0.11,
+        "prev_count": 240,
+        "prev_weight": 0.31,
+        "current_count": 160,
+        "current_weight": 0.2
+      },
+      {
+        "code": "6223",
+        "name": "旺矽",
+        "type": "增持",
+        "count_change": 40,
+        "weight_change": 0.45,
+        "prev_count": 900,
+        "prev_weight": 3.44,
+        "current_count": 940,
+        "current_weight": 3.89
+      },
+      {
+        "code": "2454",
+        "name": "聯發科",
+        "type": "增持",
+        "count_change": 35,
+        "weight_change": -0.08,
+        "prev_count": 1400,
+        "prev_weight": 3.63,
+        "current_count": 1435,
+        "current_weight": 3.55
       }
     ]
   }
